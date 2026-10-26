@@ -59,13 +59,15 @@ export class Timeline {
     const box = this.host.getBoundingClientRect();
     if (!box.width) return;
     // narrow screens scroll the timeline sideways instead of crushing it
-    const r = { width: Math.max(box.width, 880), height: box.height - (box.width < 880 ? 8 : 0) };
+    // phones get a wider strip so events fit in fewer rows
+    const r = { width: Math.max(box.width, box.width < 600 ? 1500 : 880), height: box.height - (box.width < 880 ? 6 : 0) };
+    const compact = r.height < 120;
     this.width = r.width;
     const H = r.height;
     this.svg.style('width', `${r.width}px`);
     const x = this.x();
     const svg = this.svg.attr('viewBox', `0 0 ${r.width} ${H}`).html('');
-    const mid = 30;
+    const mid = compact ? 18 : 30;
 
     // compressed-era shading
     svg.append('rect').attr('class', 'era-out').attr('x', 0).attr('width', x(STOPS[1])).attr('height', H);
@@ -76,15 +78,18 @@ export class Timeline {
     const ph = this.o.phases.map((p) => ({ d: parseDate(p.date), ...this.o.stats.get(p.id)! }));
     ph.push({ ...ph[ph.length - 1], d: STOPS[3] });
     const max = Math.max(...ph.map((p) => Math.max(p.iraqHeldKm2, p.iranHeldKm2)));
-    const y = scaleLinear().domain([0, max]).range([0, 24]);
+    const y = scaleLinear().domain([0, max]).range([0, compact ? 14 : 24]);
     const up = area<(typeof ph)[number]>().curve(curveStepAfter).x((p) => x(p.d)).y0(mid).y1((p) => mid - y(p.iraqHeldKm2));
     const down = area<(typeof ph)[number]>().curve(curveStepAfter).x((p) => x(p.d)).y0(mid).y1((p) => mid + y(p.iranHeldKm2));
     svg.append('path').attr('class', 'stream iraq').attr('d', up(ph));
     svg.append('path').attr('class', 'stream iran').attr('d', down(ph));
     svg.append('line').attr('class', 'axis').attr('x1', 0).attr('x2', r.width).attr('y1', mid).attr('y2', mid);
     // labels sit where the other stream is empty, clear of the cursor's date tag
-    svg.append('text').attr('class', 'stream-label').attr('x', x(parseDate('1983-01-01'))).attr('y', mid - 5).text('▲ Iranian soil held by Iraq');
-    svg.append('text').attr('class', 'stream-label').attr('x', x(parseDate('1981-01-01'))).attr('y', mid + 13).text('▼ Iraqi soil held by Iran');
+    if (!compact) {
+      svg.append('text').attr('class', 'stream-label').attr('x', x(parseDate('1983-01-01'))).attr('y', mid - 5).text('▲ Iranian soil held by Iraq');
+      svg.append('text').attr('class', 'stream-label').attr('x', x(parseDate('1981-01-01'))).attr('y', mid + 13).text('▼ Iraqi soil held by Iran');
+    }
+    const tickY = compact ? mid + 16 : mid + 26;
 
     // year ticks
     const years: number[] = [1937, 1975];
@@ -93,8 +98,8 @@ export class Timeline {
     const tg = svg.append('g').attr('class', 'ticks');
     for (const yy of years) {
       const xx = x(parseDate(`${yy}-01-01`));
-      tg.append('line').attr('x1', xx).attr('x2', xx).attr('y1', mid + 26).attr('y2', mid + 32);
-      tg.append('text').attr('x', xx + 3).attr('y', mid + 42).text(yy);
+      tg.append('line').attr('x1', xx).attr('x2', xx).attr('y1', tickY).attr('y2', tickY + 6);
+      tg.append('text').attr('x', xx + 3).attr('y', tickY + 16).text(yy);
     }
 
     // events in lanes so markers don't collide
@@ -106,14 +111,14 @@ export class Timeline {
       laneEnd[lane] = xx;
       return { e, xx, lane };
     });
-    const top = mid + 56;
-    const laneH = Math.max(10, Math.min(15, (H - top - 6) / Math.max(1, laneEnd.length)));
+    const top = tickY + 30;
+    const laneH = Math.max(compact ? 8 : 10, Math.min(15, (H - top - 6) / Math.max(1, laneEnd.length)));
     const eg = svg.append('g');
     const sel = eg.selectAll('g.ev').data(lanes).join('g')
       .attr('class', (l) => `ev k-${l.e.kind} s-${l.e.side ?? 'none'}`)
       .attr('transform', (l) => `translate(${l.xx},${top + l.lane * laneH})`)
       .on('click', (_, l) => this.o.onSelect(l.e));
-    sel.append('line').attr('class', 'stem').attr('y1', -(top + laneH * 0) + mid + 32).attr('y2', 0);
+    sel.append('line').attr('class', 'stem').attr('y1', -top + tickY + 6).attr('y2', 0);
     sel.append('path').attr('d', (l) => (l.e.kind === 'political' ? 'M0,-5L5,0L0,5L-5,0Z' : l.e.kind === 'atrocity' ? 'M-4,-4L4,4M4,-4L-4,4' : 'M0,0m-5,0a5,5 0 1,0 10,0a5,5 0 1,0 -10,0'))
       .attr('fill', (l) => sideColor(l.e))
       .attr('stroke', (l) => (l.e.kind === 'atrocity' ? '#111' : '#1d1a17'));
@@ -131,7 +136,7 @@ export class Timeline {
       this.setCursor(d);
       this.o.onScrub(d);
     };
-    svg.insert('rect', ':first-child').attr('class', 'scrub-area').attr('width', r.width).attr('height', mid + 46)
+    svg.insert('rect', ':first-child').attr('class', 'scrub-area').attr('width', r.width).attr('height', tickY + 20)
       .on('pointerdown', (ev: PointerEvent) => {
         scrub(ev);
         const move = (e: PointerEvent) => scrub(e);

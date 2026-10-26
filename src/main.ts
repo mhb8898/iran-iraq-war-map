@@ -66,10 +66,34 @@ async function main() {
     document.getElementById('phase-label')!.textContent = `${p.label} · ${parseDate(p.date).getUTCFullYear()}`;
   };
 
+  // Phones get a bottom sheet: 'peek' shows just the title bar over the map, 'true' slides the card up.
+  const isPhone = () => window.matchMedia('(max-width: 900px)').matches;
   const openPanel = (open: boolean) => {
-    panel.dataset.open = String(open);
+    panel.dataset.open = open ? (isPhone() ? 'peek' : 'true') : 'false';
     mapEl.dataset.panel = open ? 'open' : 'closed';
   };
+  const setPeek = (title: string, sub: string) => {
+    document.getElementById('peek-title')!.textContent = title;
+    document.getElementById('peek-sub')!.textContent = sub;
+  };
+  document.getElementById('panel-peek')!.onclick = () => {
+    panel.dataset.open = panel.dataset.open === 'true' ? 'peek' : 'true';
+  };
+  const toggleSheet = (cls: 'show-overview' | 'show-legend', other: 'show-overview' | 'show-legend') => {
+    const on = !document.body.classList.contains(cls);
+    document.body.classList.toggle(cls, on);
+    document.body.classList.remove(other);
+    document.getElementById('toggle-overview')!.setAttribute('aria-pressed', String(document.body.classList.contains('show-overview')));
+    document.getElementById('toggle-legend')!.setAttribute('aria-pressed', String(document.body.classList.contains('show-legend')));
+  };
+  document.getElementById('toggle-overview')!.onclick = () => toggleSheet('show-overview', 'show-legend');
+  document.getElementById('toggle-legend')!.onclick = () => toggleSheet('show-legend', 'show-overview');
+  // tapping the map puts the legend / overview away again
+  mapEl.addEventListener('pointerdown', () => {
+    if (!isPhone()) return;
+    document.body.classList.remove('show-legend', 'show-overview');
+    document.querySelectorAll('.map-controls [aria-pressed]').forEach((b) => b.setAttribute('aria-pressed', 'false'));
+  });
 
   const timeline = new Timeline(document.getElementById('timeline')!, {
     events,
@@ -86,6 +110,7 @@ async function main() {
       const p = phaseAt(d);
       setPhase(p);
       renderPhase(card, p, control.get(p.id)!, d);
+      setPeek(p.label, d.toISOString().slice(0, 10));
       openPanel(true);
       history.replaceState(null, '', ' ');
     },
@@ -129,6 +154,7 @@ async function main() {
     timeline.setSelected(e.id);
     timeline.setCursor(parseDate(e.date));
     openPanel(true);
+    setPeek(e.name, e.end && e.end !== e.date ? `${e.date} → ${e.end}` : e.date);
     renderEvent(card, e, wiki, { phaseBefore: before, phaseAfter: after, statsAfter: control.get(after.id)!, index: i, total: events.length });
     card.scrollTop = 0;
     card.querySelector('.replay')?.addEventListener('click', () => {
@@ -182,11 +208,11 @@ async function main() {
     playFrom(next >= 0 ? next : nextShown(-1, 1));
   };
   document.getElementById('home')!.onclick = () => map.flyTo(THEATRE);
-  document.getElementById('close-panel')!.onclick = () => openPanel(false);
+  document.getElementById('close-panel')!.onclick = () => (isPhone() && panel.dataset.open === 'true' ? (panel.dataset.open = 'peek') : openPanel(false));
   const compare = document.getElementById('compare') as HTMLInputElement;
   compare.onchange = () => map.setCompare(compare.checked);
   // the legend and the overview share the left column; on short screens the legend starts folded
-  if (window.innerWidth <= 900 || window.innerHeight < 960) document.getElementById('legend')!.classList.add('collapsed');
+  if (!isPhone() && window.innerHeight < 960) document.getElementById('legend')!.classList.add('collapsed');
   document.getElementById('legend-toggle')!.onclick = () => document.getElementById('legend')!.classList.toggle('collapsed');
   window.addEventListener('keydown', (ev) => {
     if ((ev.target as HTMLElement).tagName === 'INPUT') return;
@@ -216,7 +242,8 @@ async function main() {
     setPhase(p, false);
     timeline.setCursor(parseDate(p.date));
     renderPhase(card, p, control.get(p.id)!, parseDate(p.date));
-    openPanel(window.innerWidth > 900);
+    setPeek(p.label, p.date);
+    openPanel(true);
   }
   document.body.classList.add('ready');
 }

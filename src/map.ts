@@ -359,7 +359,8 @@ export class WarMap {
       if (k < 1.8 && !/Tigris|Euphrates|Karun/.test(r.text)) continue;
       L.append('text').attr('class', 'river-label').attr('transform', `translate(${m}) rotate(${ang})`).attr('dy', -4).text(r.text);
     }
-    if (k >= 2.2) {
+    // phones: arrow labels win over zone names (zones still name themselves on tap)
+    if (k >= 2.2 && !(this.width <= 900 && this.arrows.length)) {
       const path = geoPath(this.projection);
       for (const f of this.controlFeatures) {
         const [cx, cy] = this.transform.apply(path.centroid(f));
@@ -380,6 +381,7 @@ export class WarMap {
   setArrows(arrows: ArrowState[]) {
     this.arrows = arrows;
     this.drawArrows();
+    this.drawLabels();
   }
 
   drawArrows() {
@@ -494,11 +496,14 @@ export class WarMap {
     const column = document.querySelector('.left-col');
     const leftInset = desktop && column ? column.getBoundingClientRect().right - this.host.getBoundingClientRect().left : 0;
     const rightInset = desktop && this.host.dataset.panel === 'open' ? 400 : 0;
-    const bottomInset = !desktop && this.host.dataset.panel === 'open' ? this.height * 0.42 : 0;
-    const vw = this.width - leftInset - rightInset - pad * 2, vh = this.height - bottomInset - pad * 2;
+    // phones: slim title bar on top, the sheet's title strip (or the whole sheet) at the bottom
+    const sheet = document.getElementById('panel')?.dataset.open;
+    const topInset = desktop ? 0 : 48;
+    const bottomInset = desktop ? 0 : sheet === 'peek' ? 64 : sheet === 'true' ? this.height * 0.7 : 0;
+    const vw = this.width - leftInset - rightInset - pad * 2, vh = this.height - topInset - bottomInset - pad * 2;
     const k = Math.max(this.minK, Math.min(40, vw / (x1 - x0), vh / (y1 - y0)));
     const tx = leftInset + pad + vw / 2 - (k * (x0 + x1)) / 2;
-    const ty = pad + vh / 2 - (k * (y0 + y1)) / 2;
+    const ty = topInset + pad + vh / 2 - (k * (y0 + y1)) / 2;
     const target = zoomIdentity.translate(tx, ty).scale(k);
     return new Promise<void>((resolve) => {
       if (!duration) {
@@ -563,12 +568,13 @@ export class WarMap {
     const kmPerPx = (111.32 * Math.cos((lat * Math.PI) / 180)) / (b[0] - a[0]);
     const nice = [5, 10, 20, 25, 50, 100, 200, 250, 500].find((v) => v / kmPerPx > 70) ?? 500;
     const px = nice / kmPerPx;
-    const g = ui.append('g').attr('class', 'scalebar').attr('transform', `translate(${18},${this.height - 24})`);
+    const lift = this.width <= 900 && this.host.dataset.panel === 'open' ? 62 : 0; // clear the phone sheet's title strip
+    const g = ui.append('g').attr('class', 'scalebar').attr('transform', `translate(${18},${this.height - 24 - lift})`);
     g.append('rect').attr('width', px / 2).attr('height', 5).attr('class', 'sb-dark');
     g.append('rect').attr('x', px / 2).attr('width', px / 2).attr('height', 5).attr('class', 'sb-light');
     g.append('text').attr('y', -5).text('0');
     g.append('text').attr('x', px).attr('y', -5).attr('text-anchor', 'middle').text(`${nice} km`);
-    const nArrow = ui.append('g').attr('class', 'north').attr('transform', `translate(${30},${this.height - 70})`);
+    const nArrow = ui.append('g').attr('class', 'north').attr('transform', `translate(${30},${this.height - 70 - lift})`);
     nArrow.append('path').attr('d', 'M0,-16 L7,8 L0,3 L-7,8 Z');
     nArrow.append('text').attr('y', -20).attr('text-anchor', 'middle').text('N');
   }

@@ -43,12 +43,19 @@
       </div>
 
       <aside id="panel" data-open="false">
+        <button id="panel-peek" type="button" aria-label="Show details">
+          <span class="grip"></span>
+          <span class="peek-text"><b id="peek-title"></b><small id="peek-sub"></small></span>
+          <span class="peek-chevron" aria-hidden="true">▲</span>
+        </button>
         <button id="close-panel" type="button" aria-label="Close panel">×</button>
         <div id="card"></div>
       </aside>
 
       <div class="map-controls">
         <button id="home" type="button" title="Show the whole front">⌂</button>
+        <button id="toggle-overview" class="mobile-only" type="button" title="Whole front overview" aria-pressed="false">◰</button>
+        <button id="toggle-legend" class="mobile-only" type="button" title="Legend" aria-pressed="false">i</button>
       </div>
 
       <footer class="dock">

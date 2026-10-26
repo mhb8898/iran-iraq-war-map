@@ -273,22 +273,56 @@ a { color: #8a3b12; }
 #tip p { margin: 4px 0 0; }
 
 /* ── small screens: panel becomes a bottom sheet ─────────────────────────── */
-@media (max-width: 900px) {
-  :root { --dock-h: 150px; }
-  .masthead { top: 10px; left: 10px; right: 10px; max-width: none; padding: 8px 12px; }
-  .masthead h1 { font-size: 20px; }
-  .fa-h1 { display: none; }
-  .phase-pill { margin-top: 6px; }
-  #legend { position: absolute; bottom: calc(var(--dock-h) + 10px); left: 10px; width: 236px; }
-  #legend:not(.expanded) { }
-  #panel { top: auto; left: 10px; right: 10px; width: auto; height: 42vh; bottom: calc(var(--dock-h) + 10px); transform: translateY(calc(100% + var(--dock-h) + 20px)); }
-  #map[data-panel='open'] ~ .map-controls { right: 16px; bottom: calc(var(--dock-h) + 42vh + 20px); }
-  /* phone: a compact locator under the masthead, without the ledger */
-  .left-col { display: contents; }
-  #overview { position: absolute; top: 96px; right: 10px; width: 116px; padding: 5px; }
-  .ov-ledger, .ov-city-label { display: none; }
-  .ov-head { font-size: 9px; }
+#panel-peek, .mobile-only { display: none; }
 
-  .transport { padding: 0 6px 0 8px; }
-  .transport button { min-width: 0; padding: 5px 8px; }
+/* ── phones: the map gets the screen ──────────────────────────────────────── */
+@media (max-width: 900px) {
+  :root { --dock-h: 132px; }
+
+  /* one-line title bar */
+  .masthead { top: 0; left: 0; right: 0; max-width: none; padding: 6px 10px; border-radius: 0; border-width: 0 0 1px; display: flex; align-items: center; gap: 8px; min-height: 44px; }
+  .eyebrow, .fa-h1 { display: none; }
+  .masthead h1 { font-size: 16px; margin: 0; white-space: nowrap; }
+  .phase-pill { margin: 0 0 0 auto; font-size: 11px; padding: 3px 8px 3px 6px; max-width: 58%; overflow: hidden; }
+  .phase-pill #phase-label { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  /* legend and overview live behind buttons */
+  .left-col { display: contents; }
+  #legend, #overview { display: none; position: absolute; top: 52px; left: 8px; right: 56px; z-index: 5; max-height: calc(100% - 52px - var(--dock-h) - 80px); overflow: auto; }
+  body.show-legend #legend, body.show-overview #overview { display: block; }
+  #legend-toggle { display: none; }
+  #legend.collapsed ul, #legend.collapsed .caveat, #legend.collapsed .compare { display: revert; }
+  #legend ul { margin-top: 0; }
+  #overview { right: auto; width: min(260px, calc(100% - 64px)); }
+  .ov-city-label { display: none; }
+
+  .map-controls { top: 52px; right: 8px; bottom: auto; gap: 8px; }
+  #map[data-panel='open'] ~ .map-controls { right: 8px; bottom: auto; }
+  .mobile-only { display: block; }
+  .map-controls button { width: 40px; height: 40px; font-weight: 700; }
+  .map-controls button[aria-pressed='true'] { background: var(--ink); color: var(--paper-2); }
+
+  /* bottom sheet: closed / peek (title strip) / open */
+  #panel { z-index: 6; top: auto; left: 0; right: 0; bottom: var(--dock-h); width: auto; height: 72vh; border-radius: 14px 14px 0 0; border-width: 1px 0 0;
+    transform: translateY(100%); box-shadow: 0 -10px 30px rgba(40, 30, 15, 0.25); }
+  #panel[data-open='peek'] { transform: translateY(calc(100% - 58px)); }
+  #panel[data-open='true'] { transform: none; }
+  #panel-peek { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 58px; padding: 10px 52px 8px 16px; border: 0; border-bottom: 1px solid var(--rule); background: var(--paper-2); text-align: left; position: relative; flex: none; }
+  #panel-peek .grip { position: absolute; top: 5px; left: 50%; width: 36px; height: 4px; margin-left: -18px; border-radius: 2px; background: var(--rule); }
+  .peek-text { display: flex; flex-direction: column; min-width: 0; }
+  .peek-text b { font: 700 15px var(--serif); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .peek-text small { font-size: 11.5px; color: var(--ink-2); }
+  .peek-chevron { margin-left: auto; font-size: 11px; color: var(--ink-2); transition: transform 0.3s; }
+  #panel[data-open='true'] .peek-chevron { transform: rotate(180deg); }
+  #panel[data-open='peek'] #close-panel { display: none; }
+  #close-panel { top: 12px; right: 10px; width: 32px; height: 32px; background: transparent; color: var(--ink-2); font-size: 22px; }
+  .photo img { max-height: 180px; }
+  .card-body h2 { font-size: 20px; }
+
+  /* dock: one control row over a short timeline */
+  .dock { z-index: 7; grid-template-columns: 1fr; grid-template-rows: 42px 1fr; }
+  .transport { flex-direction: row; align-items: center; padding: 5px 8px; gap: 6px; border-right: 0; border-bottom: 1px solid var(--rule); }
+  .transport button { min-width: 0; padding: 5px 10px; }
+  .transport #play { flex: 1; max-width: 120px; }
+  .side-filter { flex: none; }
 }
