@@ -45,6 +45,7 @@ a { color: #8a3b12; }
 .border-halo { fill: none; stroke: #fffaf0; stroke-width: 6px; stroke-opacity: 0.75; vector-effect: non-scaling-stroke; stroke-linejoin: round; }
 .border-intl { fill: none; stroke: #1d1a17; stroke-width: 2px; stroke-dasharray: 9 3 2 3; vector-effect: non-scaling-stroke; stroke-linejoin: round; }
 
+.border-1937 { fill: none; stroke: #c25a12; stroke-width: 2.6px; stroke-dasharray: 2 3; vector-effect: non-scaling-stroke; }
 .zone { stroke-width: 2.2px; vector-effect: non-scaling-stroke; stroke-linejoin: round; cursor: pointer; }
 .zone.iraqHeld { stroke: var(--iraq); }
 .zone.iranHeld { stroke: var(--iran); }
@@ -130,6 +131,7 @@ a { color: #8a3b12; }
 .sw.contested { border-color: #55524c; border-style: dashed; background: radial-gradient(#4b4842 0.8px, color-mix(in srgb, var(--gray) 40%, transparent) 1.2px) 0 0 / 5px 5px; }
 .ln { display: inline-block; width: 22px; height: 0; flex: none; }
 .ln.intl { border-top: 2.5px dashed #1d1a17; box-shadow: 0 0 0 2px rgba(255, 250, 240, 0.8); }
+.ln.b1937 { border-top: 2.6px dotted #c25a12; }
 .ln.air { border-top: 2px dashed #5d5348; }
 .ar { display: inline-block; flex: none; width: 22px; height: 8px; position: relative; background: var(--c); clip-path: polygon(0 25%, 62% 25%, 62% 0, 100% 50%, 62% 100%, 62% 75%, 0 75%); }
 .ar.a-iran { --c: var(--iran); }
@@ -198,8 +200,8 @@ a { color: #8a3b12; }
 .transport { display: flex; flex-direction: column; justify-content: center; gap: 6px; padding: 0 10px 0 14px; border-right: 1px solid var(--rule); }
 .transport button { border: 1px solid var(--ink); background: var(--paper-2); padding: 6px 10px; border-radius: 3px; font-weight: 600; font-size: 12.5px; min-width: 84px; }
 #play { background: var(--ink); color: var(--paper-2); }
-#timeline { position: relative; min-width: 0; }
-.timeline-svg { display: block; width: 100%; height: 100%; user-select: none; }
+#timeline { position: relative; min-width: 0; overflow-x: auto; overflow-y: hidden; }
+.timeline-svg { display: block; height: 100%; user-select: none; }
 .era-out { fill: #000; opacity: 0.035; }
 .war-band { fill: var(--iraq); opacity: 0.7; }
 .scrub-area { fill: transparent; cursor: ew-resize; }

@@ -27,6 +27,8 @@ export interface Phase {
   iranHeld: string[]; // zone ids on Iraqi soil held by Iran
   contested: string[]; // gray: neither side in full control
   note: string;
+  /** a superseded legal border to draw alongside today's */
+  border?: '1937';
 }
 
 export type ArrowKind = 'attack' | 'counter' | 'retreat' | 'air' | 'missile' | 'naval';

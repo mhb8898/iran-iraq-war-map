@@ -37,6 +37,7 @@ export class WarMap {
   private zoomer: ZoomBehavior<SVGSVGElement, unknown>;
   private layers: { base: G; controlClip: G; control: G; top: G; overlay: G; arrows: G; places: G; labels: G; ui: G };
   private controlFeatures: ZoneFeature[] = [];
+  private historic?: '1937';
   private highlighted = new Set<string>();
   arrows: ArrowState[] = [];
   private compareX: number | null = null;
@@ -96,7 +97,7 @@ export class WarMap {
     g.append('circle').attr('cx', 3).attr('cy', 3).attr('r', 1).attr('fill', '#4b4842').attr('opacity', 0.55);
 
     // reeds for marshes
-    const m = d.append('pattern').attr('id', 'marsh').attr('patternUnits', 'userSpaceOnUse').attr('width', 14).attr('height', 9).attr('data-gap', 14).attr('data-angle', 0).attr('data-min', 0.6);
+    const m = d.append('pattern').attr('id', 'marsh').attr('patternUnits', 'userSpaceOnUse').attr('width', 14).attr('height', 9).attr('data-gap', 14).attr('data-angle', 0).attr('data-grow', '');
     m.append('rect').attr('width', 14).attr('height', 9).attr('fill', '#9fbfb0').attr('opacity', 0.55);
     m.append('path').attr('d', 'M2 7h5M4.5 7V3.5M3 7l-1-2.5M6 7l1-2.5').attr('stroke', '#3f6f62').attr('stroke-width', 0.8).attr('fill', 'none');
 
@@ -220,7 +221,40 @@ export class WarMap {
     t.append('g').selectAll('path').data(other).join('path').attr('class', 'border-other').attr('d', path as never);
     t.append('g').selectAll('path').data(ii).join('path').attr('class', 'border-halo').attr('d', path as never);
     t.append('g').selectAll('path').data(ii).join('path').attr('class', 'border-intl').attr('d', path as never);
+    this.historicLayer = t.append('g').attr('class', 'historic');
+    this.drawHistoric();
     b.append('rect').attr('x', x0).attr('y', y0).attr('width', x1 - x0).attr('height', y1 - y0).attr('filter', 'url(#paper)').attr('pointer-events', 'none');
+  }
+
+  private historicLayer?: G;
+
+  setHistoricBorder(b?: '1937') {
+    if (b === this.historic) return;
+    this.historic = b;
+    this.drawHistoric();
+  }
+
+  /** The 1937 line: today's thalweg border shifted onto the Iranian (north-east) bank of the Shatt. */
+  private drawHistoric() {
+    const g = this.historicLayer?.html('');
+    if (!g || this.historic !== '1937') return;
+    const shatt = this.geo.borders.features
+      .filter((f) => f.properties.iranIraq)
+      .flatMap((f) => (f.geometry.type === 'LineString' ? [f.geometry.coordinates] : f.geometry.type === 'MultiLineString' ? f.geometry.coordinates : []))
+      .map((l) => (l as LonLat[]).filter((p) => p[1] < 30.47 && p[0] > 48.0))
+      .filter((l) => l.length > 1);
+    const OFFSET = 0.0045; // ≈ 450 m, half the river's width
+    const lines = shatt.map((l) =>
+      l.map((p, i) => {
+        const a = l[Math.max(0, i - 1)], b = l[Math.min(l.length - 1, i + 1)];
+        let nx = -(b[1] - a[1]), ny = b[0] - a[0];
+        const len = Math.hypot(nx, ny) || 1;
+        if (nx + ny < 0) (nx = -nx), (ny = -ny); // pick the north-east side
+        return [p[0] + (nx / len) * OFFSET, p[1] + (ny / len) * OFFSET] as LonLat;
+      }),
+    );
+    const path = this.path;
+    g.selectAll('path').data(lines).join('path').attr('class', 'border-1937').attr('d', (l) => path({ type: 'LineString', coordinates: l }));
   }
 
   private prepareRiverLabels() {
@@ -407,9 +441,9 @@ export class WarMap {
     // keep hatch spacing constant on screen
     this.svg.selectAll<SVGPatternElement, unknown>('pattern[data-gap]').each(function () {
       const angle = this.getAttribute('data-angle');
-      // marsh reeds may shrink only a little, or they turn into dots
-      const min = Number(this.getAttribute('data-min') ?? 0);
-      this.setAttribute('patternTransform', `scale(${Math.max(min / Math.max(1, k / 4), 1 / k)}) rotate(${angle})`);
+      // reeds grow a little as you zoom (up to 1.8x on screen); hatches stay the same size
+      const grow = this.hasAttribute('data-grow') ? Math.min(1.8, Math.pow(k, 0.3)) : 1;
+      this.setAttribute('patternTransform', `scale(${grow / k}) rotate(${angle})`);
     });
     this.updateTiles();
     this.host.style.setProperty('--ks', String(Math.min(2.2, Math.pow(k, 0.3))));

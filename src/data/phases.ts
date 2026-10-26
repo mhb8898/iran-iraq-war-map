@@ -3,6 +3,16 @@ import type { Phase } from '../types';
 // Control snapshots. Each holds until the next one's date.
 export const PHASES: Phase[] = [
   {
+    id: 'treaty-1937', date: '1937-07-04', label: '1937 frontier treaty', border: '1937',
+    iraqHeld: [], iranHeld: [], contested: [],
+    note: 'The river border runs along the Iranian (eastern) bank of the Shatt al-Arab, not mid-channel, except for a few kilometres off Abadan. The whole waterway is Iraqi.',
+  },
+  {
+    id: 'abrogation', date: '1969-04-19', label: 'Iran rejects the 1937 line', border: '1937',
+    iraqHeld: [], iranHeld: [], contested: [],
+    note: 'Iran declares the 1937 treaty void and sails the Shatt under its own flag; Iraq still claims the 1937 line.',
+  },
+  {
     id: 'algiers', date: '1975-03-06', label: 'Algiers Agreement',
     iraqHeld: [], iranHeld: [], contested: [],
     note: 'Border fixed on the Shatt al-Arab thalweg. The line on this map is still the legal border today.',

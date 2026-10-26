@@ -36,6 +36,9 @@ export class Timeline {
   setCursor(d: Date) {
     this.cursor = d;
     this.drawCursor();
+    // keep the cursor in view when the timeline is scrollable
+    const xx = this.x()(d), w = this.host.clientWidth;
+    if (this.host.scrollWidth > w && (xx < this.host.scrollLeft + 40 || xx > this.host.scrollLeft + w - 40)) this.host.scrollTo({ left: xx - w / 2, behavior: 'smooth' });
   }
 
   setSelected(id?: string) {
@@ -44,10 +47,13 @@ export class Timeline {
   }
 
   draw() {
-    const r = this.host.getBoundingClientRect();
-    if (!r.width) return;
+    const box = this.host.getBoundingClientRect();
+    if (!box.width) return;
+    // narrow screens scroll the timeline sideways instead of crushing it
+    const r = { width: Math.max(box.width, 880), height: box.height - (box.width < 880 ? 8 : 0) };
     this.width = r.width;
     const H = r.height;
+    this.svg.style('width', `${r.width}px`);
     const x = this.x();
     const svg = this.svg.attr('viewBox', `0 0 ${r.width} ${H}`).html('');
     const mid = 30;
@@ -110,7 +116,7 @@ export class Timeline {
     cursor.append('rect').attr('class', 'cursor-tag-bg').attr('y', 0).attr('height', 16);
     cursor.append('text').attr('class', 'cursor-tag').attr('y', 12);
     const scrub = (ev: PointerEvent) => {
-      const rr = this.host.getBoundingClientRect();
+      const rr = (this.svg.node() as SVGSVGElement).getBoundingClientRect();
       const d = x.invert(Math.max(24, Math.min(r.width - 24, ev.clientX - rr.left)));
       this.setCursor(d);
       this.o.onScrub(d);

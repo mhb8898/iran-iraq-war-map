@@ -51,6 +51,7 @@ async function main() {
     current = p;
     const changed = new Set(prev ? [...p.iraqHeld, ...p.iranHeld, ...p.contested].filter((z) => ![...prev.iraqHeld, ...prev.iranHeld, ...prev.contested].includes(z)) : []);
     map.drawControl(control.get(p.id)!.features, animate, changed);
+    map.setHistoricBorder(p.border);
     document.getElementById('phase-label')!.textContent = `${p.label} · ${parseDate(p.date).getUTCFullYear()}`;
   };
 
@@ -157,6 +158,7 @@ async function main() {
   document.getElementById('close-panel')!.onclick = () => openPanel(false);
   const compare = document.getElementById('compare') as HTMLInputElement;
   compare.onchange = () => map.setCompare(compare.checked);
+  if (window.innerWidth <= 900) document.getElementById('legend')!.classList.add('collapsed');
   document.getElementById('legend-toggle')!.onclick = () => document.getElementById('legend')!.classList.toggle('collapsed');
   window.addEventListener('keydown', (ev) => {
     if ((ev.target as HTMLElement).tagName === 'INPUT') return;
@@ -181,7 +183,8 @@ async function main() {
   const hashed = events.findIndex((e) => e.id === location.hash.slice(1));
   if (hashed >= 0) select(hashed);
   else {
-    const p = PHASES[0];
+    // open on the moment that shows the most: the furthest Iraqi advance
+    const p = PHASES.find((ph) => ph.id === 'invasion-max')!;
     setPhase(p, false);
     timeline.setCursor(parseDate(p.date));
     renderPhase(card, p, control.get(p.id)!, parseDate(p.date));

@@ -57,7 +57,7 @@ const tint = (e) => {
 
 const rgb = Buffer.alloc(cw * ch * 3);
 const tintRgb = Buffer.alloc(cw * ch * 3);
-const height16 = Buffer.alloc(cw * ch * 2);
+const height16 = new Uint16Array(cw * ch); // a Uint16Array tells sharp the raw data is 16-bit
 const az = (315 * Math.PI) / 180, alt = (40 * Math.PI) / 180, zf = 3.2;
 for (let j = 0; j < ch; j++) {
   const lat = N - ((N - S) * j) / ch; // close enough for the cell size
@@ -76,7 +76,7 @@ for (let j = 0; j < ch; j++) {
       rgb[k + q] = Math.max(0, Math.min(255, c[q] * (0.46 + 0.84 * shade)));
       tintRgb[k + q] = c[q];
     }
-    height16.writeUInt16BE(Math.max(0, Math.min(65535, Math.round(e + 1000))), (j * cw + i) * 2);
+    height16[j * cw + i] = Math.max(0, Math.min(65535, Math.round(e + 1000)));
   }
 }
 
