@@ -89,6 +89,7 @@ a { color: #8a3b12; }
 .arrow.naval .casing { stroke: #1b4f6b; stroke-opacity: 0.8; }
 .arrow .counter-core { fill: none; stroke: #fffaf0; opacity: 0.85; }
 .arrow .glyph { font-size: 14px; text-anchor: middle; dominant-baseline: central; fill: #1d1a17; }
+.offmap text { font: 700 11px var(--sans); letter-spacing: 0.04em; fill: #fffaf0; paint-order: stroke; stroke: #1d1a17; stroke-width: 4px; stroke-linejoin: round; }
 .arrow-label { font: 700 11px var(--sans); text-transform: uppercase; letter-spacing: 0.06em; text-anchor: middle; paint-order: stroke; stroke: #fbf6ea; stroke-width: 3.4px; stroke-linejoin: round; }
 .arrow.side-iran .body { filter: drop-shadow(0 1px 1.5px rgba(0, 0, 0, 0.35)); }
 .arrow.side-iraq .body { filter: drop-shadow(0 1px 1.5px rgba(0, 0, 0, 0.35)); }

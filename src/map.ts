@@ -132,7 +132,11 @@ export class WarMap {
     const [bx0, by0] = this.projection([w, n])!;
     const [bx1, by1] = this.projection([e, s])!;
     this.minK = Math.max(r.width / (bx1 - bx0), r.height / (by1 - by0));
-    this.zoomer.extent([[0, 0], [r.width, r.height]]).scaleExtent([this.minK, 40]).translateExtent([[bx0, by0], [bx1, by1]]);
+    // Allow panning past the map edge by the width of the floating panels (left column, detail card),
+    // so places near the edge — like the far end of the H-3 raid — can be brought out from under them.
+    const desktop = r.width > 900;
+    const [ml, mr, mt, mb] = (desktop ? [300, 420, 0, 0] : [0, 0, 50, 70]).map((m) => m / this.minK);
+    this.zoomer.extent([[0, 0], [r.width, r.height]]).scaleExtent([this.minK, 40]).translateExtent([[bx0 - ml, by0 - mt], [bx1 + mr, by1 + mb]]);
     if (first) this.flyTo([44.2, 29.6, 50.2, 37.3], 0);
     this.applyTransform();
   }
@@ -397,7 +401,7 @@ export class WarMap {
       const kind = arrow.kind ?? 'attack';
       const ballistic = kind === 'air' || kind === 'missile';
       let d: string;
-      if (ballistic) {
+      if (ballistic && !arrow.route) {
         // great sweeping arc between the end points, bulging to the left of travel
         const [a, b] = [pts[0], pts[pts.length - 1]];
         const dx = b[0] - a[0], dy = b[1] - a[1];
@@ -443,6 +447,15 @@ export class WarMap {
       if (kind === 'counter') g.select('path.head').attr('stroke', color);
       if (kind === 'air') g.append('text').attr('class', 'glyph').attr('transform', `translate(${tip.x},${tip.y}) rotate(${ang + 45})`).text('✈');
 
+      if (arrow.offMap && t > 0.97) {
+        // tag at the map edge: "→ H-3 air base" pointing on along the arrow's heading
+        // the tag sits on the map side of the tip (beyond it is the edge or a floating panel);
+        // its arrow glyph points the way the flight continues
+        const westward = Math.cos((ang * Math.PI) / 180) < 0;
+        const tag = g.append('g').attr('class', 'offmap').attr('transform', `translate(${tip.x},${tip.y})`);
+        tag.append('text').attr('x', westward ? 12 : -12).attr('y', 18).attr('text-anchor', westward ? 'start' : 'end')
+          .text(westward ? `◀ ${arrow.offMap}` : `${arrow.offMap} ▶`);
+      }
       if (arrow.label && t > 0.55) {
         // try a few spots along and either side of the arrow until the label doesn't collide
         const tw = arrow.label.length * 6.8 + 6;

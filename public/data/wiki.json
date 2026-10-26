@@ -1575,5 +1575,95 @@
   "title": "Operation Shining Sun",
   "url": "https://en.wikipedia.org/wiki/Operation_Shining_Sun",
   "extract": "Operation Shining Sun, also known as Operation Sunshine or Operation Aftab, was the first major military operation of the National Liberation Army of Iran, the militant arm of the People's Mojahedin Organization of Iran. The goal of the leftist organization was to overthrow the Khomeini regime."
+ },
+ "H-3 airstrike": {
+  "title": "H-3 airstrike",
+  "url": "https://en.wikipedia.org/wiki/H-3_airstrike",
+  "extract": "The H-3 airstrike (Persian: عملیات اچ۳) was a surprise air attack by the Iranian Air Force during the Iran–Iraq War on 4 April 1981 against the Iraqi Air Force's H-3 Air Base in western Iraq.  The Iranians destroyed at least 48 Iraqi aircraft on the ground with no losses of their own. Based on the results achieved, it is considered one of the most successful raids in the history of aerial warfare.",
+  "thumb": {
+   "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/ae/Operation_H3_map.png/960px-Operation_H3_map.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+   "width": 640,
+   "height": 683
+  },
+  "image": "Operation_H3_map.png",
+  "coords": [
+   39.59138889,
+   32.74888889
+  ],
+  "fa": {
+   "title": "عملیات اچ۳",
+   "url": "https://fa.wikipedia.org/wiki/%D8%B9%D9%85%D9%84%DB%8C%D8%A7%D8%AA_%D8%A7%DA%86%DB%B3"
+  }
+ },
+ "Operation Opera": {
+  "title": "Operation Opera",
+  "url": "https://en.wikipedia.org/wiki/Operation_Opera",
+  "extract": "Operation Opera (Hebrew: מִבְצָע אוֹפֵּרָה), also known as Operation Babylon, was a surprise airstrike conducted by the Israeli Air Force on 7 June 1981, which destroyed an unfinished Iraqi nuclear reactor located 17 kilometres (11 miles) southeast of Baghdad, Iraq. The Israeli operation came a year after the Islamic Republic of Iran Air Force had caused minor damage to the same nuclear facility in Operation Scorch Sword, with the damage having been subsequently repaired by French technicians. Operation Opera, and related Israeli government statements following it, established the Begin Doctrine, which explicitly stated the strike was not an anomaly, but instead \"a precedent for every future government in Israel\". Israel's counter-proliferation preventive strike added another dimension to its existing policy of deliberate ambiguity, as it related to the nuclear weapons capability of other states in the region.",
+  "coords": [
+   44.51861111,
+   33.20333333
+  ],
+  "fa": {
+   "title": "عملیات اپرا",
+   "url": "https://fa.wikipedia.org/wiki/%D8%B9%D9%85%D9%84%DB%8C%D8%A7%D8%AA_%D8%A7%D9%BE%D8%B1%D8%A7"
+  }
+ },
+ "Operation Earnest Will": {
+  "title": "Operation Earnest Will",
+  "url": "https://en.wikipedia.org/wiki/Operation_Earnest_Will",
+  "extract": "Operation Earnest Will (24 July 1987 – 26 September 1988) was an American military protection of Kuwaiti-owned tankers from Iranian attacks in 1987 and 1988, three years into the Tanker War phase of the Iran–Iraq War. It was the largest naval convoy operation since World War II, and flowed from Resolution 598 which had been adopted three days earlier.\nThe U.S. Navy warships that escorted the tankers, part of U.S. Naval Forces Central Command, were the operations' most visible part. U.S. Air Force AWACS radar planes provided surveillance and U.S. Army special-operations helicopters hunted for possible attackers.",
+  "thumb": {
+   "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/43/EarnestWillNicholas.jpg/960px-EarnestWillNicholas.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+   "width": 640,
+   "height": 418
+  },
+  "image": "EarnestWillNicholas.jpg",
+  "fa": {
+   "title": "عملیات اراده جدی",
+   "url": "https://fa.wikipedia.org/wiki/%D8%B9%D9%85%D9%84%DB%8C%D8%A7%D8%AA_%D8%A7%D8%B1%D8%A7%D8%AF%D9%87_%D8%AC%D8%AF%DB%8C"
+  }
+ },
+ "USS Stark incident": {
+  "title": "USS Stark incident",
+  "url": "https://en.wikipedia.org/wiki/USS_Stark_incident",
+  "extract": "The USS Stark incident occurred during the Iran–Iraq War in the Persian Gulf on 17 May 1987, when an Iraqi jet aircraft fired two Exocet missiles at the U.S. frigate USS Stark. A total of 37 United States Navy personnel were killed or later died as a result of the attack, and 21 were injured. Iraq apologized, and Saddam Hussein said that the pilot mistook the frigate for an Iranian tanker.",
+  "thumb": {
+   "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/55/USS_Stark.jpg/960px-USS_Stark.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+   "width": 640,
+   "height": 426
+  },
+  "image": "USS_Stark.jpg",
+  "coords": [
+   51.91666667,
+   26.78333333
+  ],
+  "fa": {
+   "title": "رویداد یواس‌اس استارک",
+   "url": "https://fa.wikipedia.org/wiki/%D8%B1%D9%88%DB%8C%D8%AF%D8%A7%D8%AF_%DB%8C%D9%88%D8%A7%D8%B3%E2%80%8C%D8%A7%D8%B3_%D8%A7%D8%B3%D8%AA%D8%A7%D8%B1%DA%A9"
+  }
+ },
+ "Operation Praying Mantis": {
+  "title": "Operation Praying Mantis",
+  "url": "https://en.wikipedia.org/wiki/Operation_Praying_Mantis",
+  "extract": "Operation Praying Mantis was the 18 April 1988 attack by the United States on Iranian naval targets in the Persian Gulf in retaliation for the mining of a U.S. warship four days earlier. It took place during the US presidency of Ronald Reagan and the rule of Supreme Leader of Iran Ruhollah Khomeini.\nOn 14 April, the American guided missile frigate USS Samuel B. Roberts struck a mine while transiting international waters as part of Operation Earnest Will, the 1987–88 effort to protect reflagged Kuwaiti oil tankers from Iranian attacks during the Iran–Iraq War. The explosion pierced the hull and broke the keel of the Samuel B. Roberts, which nearly sank but was saved by its crew with no loss of life.",
+  "thumb": {
+   "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c3/OperationPrayingMantis-IS_Alvand.jpg/960px-OperationPrayingMantis-IS_Alvand.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+   "width": 640,
+   "height": 474
+  },
+  "image": "OperationPrayingMantis-IS_Alvand.jpg",
+  "fa": {
+   "title": "عملیات آخوندک",
+   "url": "https://fa.wikipedia.org/wiki/%D8%B9%D9%85%D9%84%DB%8C%D8%A7%D8%AA_%D8%A2%D8%AE%D9%88%D9%86%D8%AF%DA%A9"
+  }
+ },
+ "Seawise Giant": {
+  "title": "Seawise Giant",
+  "url": "https://en.wikipedia.org/wiki/Seawise_Giant",
+  "extract": "TT Seawise Giant—formerly Oppama; later Happy Giant, Jahre Viking, Knock Nevis, and Mont—was a ULCC supertanker and the longest self-propelled ship ever built. It was constructed in 1974–1979 by Sumitomo Heavy Industries in Yokosuka, Kanagawa, Japan. Seawise Giant's engines were powered by Ljungström turbines. The ship had the greatest deadweight tonnage ever recorded.",
+  "fa": {
+   "title": "سی‌وایز بزرگ",
+   "url": "https://fa.wikipedia.org/wiki/%D8%B3%DB%8C%E2%80%8C%D9%88%D8%A7%DB%8C%D8%B2_%D8%A8%D8%B2%D8%B1%DA%AF"
+  }
  }
 }

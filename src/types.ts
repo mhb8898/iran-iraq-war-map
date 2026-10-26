@@ -38,6 +38,10 @@ export interface Arrow {
   kind?: ArrowKind;
   path: LonLat[];
   label?: string;
+  /** air/missile only: follow every point (a real flight route) instead of one sweeping arc */
+  route?: boolean;
+  /** the target lies beyond the map edge where this arrow ends; shown as a tag at the tip */
+  offMap?: string;
 }
 
 export type EventKind = 'operation' | 'battle' | 'air' | 'naval' | 'political' | 'atrocity';

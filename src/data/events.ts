@@ -265,7 +265,7 @@ export const EVENTS: WarEvent[] = [
   },
   {
     id: 'tanker-war', date: '1984-03-27', end: '1988-07-20', name: 'Tanker War begins', fa: 'جنگ نفتکش‌ها', kind: 'air', side: 'iraq',
-    summary: 'Iraq attacks shipping using Iran\'s Kharg Island oil terminal with Super Étendards and Exocets, aiming to strangle Iran\'s exports. Iran retaliates against tankers serving Kuwait and Saudi Arabia, eventually drawing in the US Navy.',
+    summary: 'Unable to win on the ground, Iraq turns its rebuilt air force on Iran\'s oil: Kharg Island, the main export terminal, and any ship trading with Iranian ports. Part of the aim is to provoke Iran into closing the Strait of Hormuz and so bring in the Americans. Iran instead hits tankers carrying Iraqi oil from Kuwait and Saudi Arabia — first on 13 May 1984 — and moves its exports south to Larak Island. Lloyd\'s later counted 546 ships damaged and about 430 sailors killed; Iraq made three times as many attacks as Iran.',
     wiki: 'Tanker War',
     arrows: [{ side: 'iraq', kind: 'air', path: [BAGHDAD, [48.0, 31.0], [50.3, 29.28]], label: 'Kharg Island' }],
     places: ['kharg'], focus: [44.0, 28.4, 51.6, 33.6], refs: ['cordesman', 'razoux'],
@@ -539,6 +539,89 @@ export const EVENTS: WarEvent[] = [
     wiki: 'Operation Shining Sun',
     arrows: [{ side: 'other', path: [[47.55, 32.02], [47.75, 32.07], [47.95, 32.13]], label: 'MEK' }],
     places: ['fakkeh', 'shush', 'amarah'], focus: [47.2, 31.8, 48.4, 32.5], refs: ['razoux'],
+  },
+
+  // ── Raids and the war at sea ────────────────────────────────────────────────
+  {
+    id: 'h3', date: '1981-04-04', name: 'H-3 airstrike', fa: 'عملیات اچ۳', kind: 'air', side: 'iran', outcome: 'iran',
+    summary: 'Iranian intelligence believed Iraq had moved its best aircraft to the H-3 bases in the far west, 1,000 km from Iran. Eight F-4E Phantoms from Hamadan, with F-14 escorts and in-flight refuelling, flew north to Lake Urmia, then west along the Turkish border below 100 m to dodge radar, and swung south onto the airfields — about 3,500 km in all. Iran claimed at least 48 aircraft destroyed with no losses; Iraq said only one MiG-21 was damaged. Either way it is one of the boldest raids of the war.',
+    wiki: 'H-3 airstrike',
+    arrows: [
+      { side: 'iran', kind: 'air', route: true, path: [HAMADAN, [47.2, 36.4], [45.6, 37.65], [44.2, 37.25], [42.8, 37.12], [41.8, 36.55], [40.55, 33.83]], label: 'Low over the Turkish border', offMap: 'H-3 air bases' },
+    ],
+    places: ['kirkuk', 'baghdad'], focus: [40.4, 33.2, 46.2, 38.2], refs: ['razoux', 'cordesman'],
+  },
+  {
+    id: 'opera', date: '1981-06-07', name: 'Israel bombs Osirak (Operation Opera)', kind: 'air', side: 'other',
+    summary: 'Israeli F-16s destroy Iraq\'s unfinished French-built reactor near Baghdad — the same site Iranian Phantoms had damaged nine months earlier in Operation Scorch Sword. It ends Saddam\'s plutonium route to a bomb.',
+    wiki: 'Operation Opera',
+    arrows: [{ side: 'other', kind: 'air', path: [[40.55, 32.55], [42.4, 32.7], [44.52, 33.21]], label: 'From Israel' }],
+    places: ['baghdad'], focus: [40.5, 31.8, 45.5, 34.2], refs: ['razoux'],
+  },
+  {
+    id: 'cities-1984', date: '1984-02-07', end: '1984-02-22', name: 'First War of the Cities', fa: 'جنگ شهرها', kind: 'air', side: 'iraq',
+    summary: 'Saddam orders his air force against eleven Iranian cities — the start of systematic strategic bombing in the war. Around 1,200 Iranian civilians are killed in February alone; Iran answers by shelling Basra and other border cities.',
+    wiki: 'War of the Cities',
+    arrows: [
+      { side: 'iraq', kind: 'air', path: [BAGHDAD, [48.0, 35.3], TEHRAN], label: 'Tehran' },
+      { side: 'iraq', kind: 'air', path: [BAGHDAD, [46.0, 34.5], [47.07, 34.31]], label: 'Kermanshah' },
+      { side: 'iraq', kind: 'air', path: [[45.9, 32.5], [47.2, 32.0], [48.4, 32.38]], label: 'Dezful' },
+      { side: 'iraq', kind: 'air', path: [[47.6, 30.6], [48.2, 30.8], [48.67, 31.32]], label: 'Ahvaz' },
+      { side: 'iran', kind: 'missile', path: [[48.18, 30.5], [47.98, 30.55], [47.81, 30.51]], label: 'Shelling Basra' },
+    ],
+    places: ['tehran', 'kermanshah', 'dezful', 'ahvaz', 'basra'], focus: [44.0, 30.0, 52.0, 36.3], refs: ['cordesman', 'razoux'],
+  },
+  {
+    id: 'earnest-will', date: '1987-07-24', end: '1988-09-26', name: 'Operation Earnest Will: US tanker convoys', kind: 'naval', side: 'other',
+    summary: 'After Iranian speedboat attacks on its shipping, Kuwait asks foreign powers for protection. The Soviet Union charters tankers to Kuwait; the US reflags Kuwaiti tankers under the American flag and, from 24 July 1987, escorts them in the largest naval convoy operation since the Second World War. Ships carrying Iraqi and Kuwaiti oil are now protected; ships trading with Iran are not.',
+    wiki: 'Operation Earnest Will',
+    arrows: [{ side: 'other', kind: 'naval', path: [[48.2, 29.25], [49.3, 28.85], [50.3, 28.35]], label: 'Reflagged convoys', offMap: 'to Hormuz' }],
+    places: ['kuwait', 'kharg'], focus: [47.4, 28.3, 51.4, 30.4], refs: ['cordesman', 'razoux'],
+  },
+  {
+    id: 'stark', date: '1987-05-17', name: 'Iraqi missiles hit USS Stark', kind: 'naval', side: 'iraq',
+    summary: 'An Iraqi Mirage F1 fires two Exocet missiles at the American frigate USS Stark in the Gulf, killing 37 sailors — still the only successful anti-ship missile strike on a US warship. Iraq calls it a mistake; why the pilot fired was never fully explained.',
+    wiki: 'USS Stark incident',
+    arrows: [{ side: 'iraq', kind: 'air', path: [[47.75, 30.4], [48.9, 29.6], [49.83, 28.35]], label: 'Mirage F1 + Exocets', offMap: 'USS Stark, off Bahrain' }],
+    places: ['basra', 'kuwait'], focus: [47.2, 28.3, 51.0, 30.8], refs: ['cordesman'],
+  },
+  {
+    id: 'airbases-1987', date: '1987-11-01', end: '1987-12-31', name: 'Iraqi blitz on Khuzestan air bases', kind: 'air', side: 'iraq', outcome: 'iran',
+    summary: 'Iraq tries to finish off what is left of the Iranian air force by bombing its bases in Khuzestan. Iranian fighters, anti-aircraft guns and missiles shoot down about 30 Iraqi jets, and Iran\'s air force survives to the end of the war.',
+    wiki: 'Iran–Iraq War',
+    arrows: [
+      { side: 'iraq', kind: 'air', path: [[46.6, 31.9], [47.6, 32.4], [48.4, 32.43]], label: 'Vahdati (Dezful)' },
+      { side: 'iraq', kind: 'air', path: [[47.6, 30.5], [48.7, 30.4], [49.65, 30.78]], label: 'Omidiyeh' },
+    ],
+    places: ['dezful', 'ahvaz'], focus: [46.3, 29.9, 50.2, 32.9], refs: ['cordesman'],
+  },
+  {
+    id: 'kharg-1988', date: '1988-03-18', name: 'Iraq\'s great Kharg Island raid', kind: 'air', side: 'iraq', outcome: 'iraq',
+    summary: 'By now US warships track Iranian shipping and defences, and Iraq can strike deep into the Gulf. A massive raid on Kharg Island destroys two supertankers; Iraq loses five aircraft.',
+    wiki: 'Kharg Island',
+    arrows: [{ side: 'iraq', kind: 'air', path: [[47.6, 30.55], [49.0, 30.2], [50.31, 29.26]], label: 'Massed strike' }],
+    places: ['kharg', 'basra'], focus: [47.2, 28.6, 51.2, 30.9], refs: ['cordesman', 'razoux'],
+  },
+  {
+    id: 'praying-mantis', date: '1988-04-18', name: 'Operation Praying Mantis', kind: 'naval', side: 'other',
+    summary: 'Four days after the frigate USS Samuel B. Roberts hits an Iranian mine, the US Navy strikes back in its largest surface battle since the Second World War. Two Iranian oil platforms, two frigates, a fast-attack craft and several armed boats are destroyed or damaged, in the southern Gulf (off this map). It falls on the same day Iraq retakes Faw, and pushes Tehran toward a ceasefire.',
+    wiki: 'Operation Praying Mantis',
+    arrows: [{ side: 'other', kind: 'naval', path: [[49.6, 28.9], [50.6, 28.6], [51.6, 28.35]], offMap: 'Sassan & Sirri platforms' }],
+    places: ['kharg'], focus: [48.0, 28.3, 52.0, 30.2], refs: ['cordesman'],
+  },
+  {
+    id: 'seawise-giant', date: '1988-05-14', name: 'Seawise Giant hit', kind: 'naval', side: 'iraq',
+    summary: 'Iraqi jets fly the length of the Gulf to Larak Island in the Strait of Hormuz — Iran\'s new loading point, chosen because it was meant to be out of reach — and hit the Seawise Giant, the longest ship ever built, with Exocets as she lies at anchor loaded with Iranian crude.',
+    wiki: 'Seawise Giant',
+    arrows: [{ side: 'iraq', kind: 'air', path: [[47.7, 30.4], [49.9, 29.6], [51.95, 28.65]], label: 'Long-range strike', offMap: 'Larak Island, Hormuz' }],
+    places: ['kharg', 'basra'], focus: [47.2, 28.3, 52.0, 30.8], refs: ['cordesman'],
+  },
+  {
+    id: 'palace-1988', date: '1988-06-13', name: 'Iranian jets strike Saddam\'s palace', kind: 'air', side: 'iran',
+    summary: 'In Iran\'s last counter-offensive of the war, Revolutionary Guards push about 10 km into Iraq while Iranian fighters reach Baghdad and hit Saddam\'s presidential palace. Within three days Iraq — with some 650 helicopter and 300 aircraft sorties — has driven the attack back.',
+    wiki: 'Iran–Iraq War',
+    arrows: [{ side: 'iran', kind: 'air', path: [HAMADAN, [46.4, 34.5], BAGHDAD], label: 'Presidential palace' }],
+    places: ['baghdad'], focus: [43.8, 32.6, 49.0, 35.5], refs: ['razoux', 'murray-woods'],
   },
 
   // ── After ───────────────────────────────────────────────────────────────────────
