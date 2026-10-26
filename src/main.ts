@@ -14,6 +14,13 @@ const THEATRE: [number, number, number, number] = [44.2, 29.6, 50.2, 37.3];
 const DAY = 864e5;
 
 const events = [...EVENTS].sort((a, b) => a.date.localeCompare(b.date));
+
+type SideFilter = 'all' | 'iran' | 'iraq';
+// An event belongs to a side if that side started it or won it (Iraq "wins" the Iranian
+// offensives it stopped). MEK operations count as Iraqi-backed; shared diplomacy shows under both.
+const involves = (e: WarEvent, f: SideFilter) =>
+  f === 'all' || e.side === f || e.outcome === f || e.side === 'both' ||
+  (e.kind === 'political' && !e.side) || (f === 'iraq' && e.side === 'other' && e.kind === 'operation');
 const phaseAt = (d: Date): Phase => [...PHASES].reverse().find((p) => parseDate(p.date) <= d) ?? PHASES[0];
 const phaseBefore = (e: WarEvent) => [...PHASES].reverse().find((p) => p.date < e.date) ?? PHASES[0];
 // Ground fighting shows the front once it's over; long air/naval campaigns and political events show it as they began.
@@ -133,17 +140,32 @@ async function main() {
     await animateArrows(e, after);
   }
 
-  const step = (d: number) => select(Math.max(0, Math.min(events.length - 1, (selected < 0 ? -1 : selected) + d)));
+  let filter: SideFilter = 'all';
+  const nextShown = (from: number, d: number) => {
+    for (let i = from + d; i >= 0 && i < events.length; i += d) if (involves(events[i], filter)) return i;
+    return -1;
+  };
+  const step = (d: number) => {
+    const i = nextShown(selected < 0 ? (d > 0 ? -1 : events.length) : selected, d);
+    if (i >= 0) select(i);
+  };
+  document.querySelectorAll<HTMLButtonElement>('.side-filter button').forEach((b) => {
+    b.onclick = () => {
+      filter = b.dataset.side as SideFilter;
+      document.querySelectorAll('.side-filter button').forEach((o) => o.setAttribute('aria-pressed', String(o === b)));
+      timeline.setFilter((e) => involves(e, filter));
+    };
+  });
   function stop() {
     playing = false;
     clearTimeout(playTimeout);
     document.getElementById('play')!.textContent = '▶ Play';
   }
   async function playFrom(i: number) {
-    if (!playing || i >= events.length) return stop();
+    if (!playing || i < 0 || i >= events.length) return stop();
     await select(i);
     if (!playing) return;
-    playTimeout = window.setTimeout(() => playFrom(i + 1), 2600);
+    playTimeout = window.setTimeout(() => playFrom(nextShown(i, 1)), 2600);
   }
 
   document.getElementById('prev')!.onclick = () => (stop(), step(-1));
@@ -152,7 +174,8 @@ async function main() {
     if (playing) return stop();
     playing = true;
     (ev.currentTarget as HTMLElement).textContent = '❚❚ Pause';
-    playFrom(selected < 0 || selected >= events.length - 1 ? 0 : selected + 1);
+    const next = nextShown(selected, 1);
+    playFrom(next >= 0 ? next : nextShown(-1, 1));
   };
   document.getElementById('home')!.onclick = () => map.flyTo(THEATRE);
   document.getElementById('close-panel')!.onclick = () => openPanel(false);

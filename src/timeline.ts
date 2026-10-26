@@ -26,6 +26,7 @@ export class Timeline {
   constructor(private host: HTMLElement, private o: Opts) {
     this.svg = select(host).append('svg').attr('class', 'timeline-svg');
     new ResizeObserver(() => this.draw()).observe(host);
+    this.draw(); // don't wait for the observer: it never fires in a background tab
   }
 
   private x() {
@@ -39,6 +40,14 @@ export class Timeline {
     // keep the cursor in view when the timeline is scrollable
     const xx = this.x()(d), w = this.host.clientWidth;
     if (this.host.scrollWidth > w && (xx < this.host.scrollLeft + 40 || xx > this.host.scrollLeft + w - 40)) this.host.scrollTo({ left: xx - w / 2, behavior: 'smooth' });
+  }
+
+  private shown: (e: WarEvent) => boolean = () => true;
+
+  /** Dim events outside the filter; they stay in place so the timeline doesn't reshuffle. */
+  setFilter(fn: (e: WarEvent) => boolean) {
+    this.shown = fn;
+    this.svg.selectAll<SVGGElement, { e: WarEvent }>('g.ev').classed('dim', (l) => !fn(l.e));
   }
 
   setSelected(id?: string) {
@@ -109,7 +118,7 @@ export class Timeline {
       .attr('fill', (l) => sideColor(l.e))
       .attr('stroke', (l) => (l.e.kind === 'atrocity' ? '#111' : '#1d1a17'));
     sel.append('title').text((l) => `${l.e.date} — ${l.e.name}`);
-    sel.classed('selected', (l) => l.e.id === this.selected);
+    sel.classed('selected', (l) => l.e.id === this.selected).classed('dim', (l) => !this.shown(l.e));
 
     // scrubbing
     const cursor = svg.append('g').attr('class', 'cursor');

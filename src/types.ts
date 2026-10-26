@@ -48,6 +48,8 @@ export interface WarEvent {
   end?: string;
   name: string;
   fa?: string;
+  /** Arabic / Iraqi code name */
+  ar?: string;
   kind: EventKind;
   side?: Side | 'both' | 'other';
   /** who came out ahead; omitted for political events */

@@ -1529,5 +1529,51 @@
   "mawat": "Mawat",
   "zubair": "Az Zubayr",
   "kharg": "Kharg Island"
+ },
+ "Operation Dezful": {
+  "title": "Operation Dezful",
+  "url": "https://en.wikipedia.org/wiki/Operation_Dezful",
+  "extract": "Operation Dezful was fought in early stage of the Iran–Iraq War on 15 October 1980 as Iranian tank brigades from the 16th Qazvin, 77th Khorasan, and 92nd Khuzestan armoured divisions attacked Iraqi positions. The Iranian Army's aim was to stop Iraqis progress in Iranian territories and to push them back. However, Iraqi forces counterattacked from the flanks, and repulsed the Iranian forces. The Iranian failure was blamed on poor decision making, the purge of army commanders due to their participation in Nojeh coup plot, and underestimating fire power of Iraqi forces and they were forced to retreat to the eastern shores of Dez River west of Dezful.",
+  "coords": [
+   48.4667,
+   32.3833
+  ],
+  "fa": {
+   "title": "عملیات پل نادری",
+   "url": "https://fa.wikipedia.org/wiki/%D8%B9%D9%85%D9%84%DB%8C%D8%A7%D8%AA_%D9%BE%D9%84_%D9%86%D8%A7%D8%AF%D8%B1%DB%8C"
+  }
+ },
+ "Liberation of Susangerd": {
+  "title": "Liberation of Susangerd",
+  "url": "https://en.wikipedia.org/wiki/Liberation_of_Susangerd",
+  "extract": "Liberation of Susangerd (also known as \"Susangerd-Operation\") was a military operation during Iran-Iraq War, which was commenced on 19 November 1980 by the common command of Islamic Republic of Iran Army and Islamic Revolutionary Guard Corps and \"Irregular Forces Headquarters\". This operation's goal was to save Susangard city from the danger of a certain fall.\nAt the operation of Susangerd There were 24 pilots who participated in the operation, and some of them were killed, namely:\n\nHoushang Kiyan Ara\nSeyyed Mohammad-Taqi Hosseini\nMohammad Kam-Bakhsh Ziyaei\nNematollah Akbari Samani\nYounes Khosh-Bin\nEbrahim Omid-Bakhsh\nThe list of the pilots (of F-5/F-14) who took part in Susangerd-operation, is as follows:\n\nDavoud Sadeqi\nMahmoud Naeimi\nShir-Afkan Hemmati\nJalal Aram\nParviz Nasri\nBehnam Qanamiyan\nAhmad Mehr-Niya\nSeyyed Esmaeil Mousavi\nSiyavash Moshiri\nHabibollah Baqaei\nDavoud Salman\nQasem Mohammad Amini\nIraj Osareh\nAkbar Tavangariyan\nMohammad Masbouq\nReza Ramezani\nFazlollah Javid-Niya\nDavoud Asgari\nEventually, at Susangerd operation, Iranian forces broke the siege of the city, and rejected the Iraqis forces.",
+  "fa": {
+   "title": "عملیات سوسنگرد",
+   "url": "https://fa.wikipedia.org/wiki/%D8%B9%D9%85%D9%84%DB%8C%D8%A7%D8%AA_%D8%B3%D9%88%D8%B3%D9%86%DA%AF%D8%B1%D8%AF"
+  }
+ },
+ "Chemical bombing of Sardasht": {
+  "title": "Chemical bombing of Sardasht",
+  "url": "https://en.wikipedia.org/wiki/Chemical_bombing_of_Sardasht",
+  "extract": "On 28 June 1987, Iraq dropped mustard gas bombs on Sardasht, West Azerbaijan, Iran. In two separate bombing runs on four residential areas, the attack killed 130 people and injured 8,000. The gas attacks occurred during the Iran–Iraq War when Iraq frequently used chemical weapons against Iranian civilians and soldiers.\nIn 2006, a quarter of the town's 20,000 residents were still experiencing severe illnesses from the attacks.",
+  "thumb": {
+   "src": "https://upload.wikimedia.org/wikipedia/commons/a/ab/Sardasht_victems.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+   "width": 600,
+   "height": 400
+  },
+  "image": "Sardasht_victems.jpg",
+  "coords": [
+   45.47888889,
+   36.15527778
+  ],
+  "fa": {
+   "title": "بمباران شیمیایی سردشت",
+   "url": "https://fa.wikipedia.org/wiki/%D8%A8%D9%85%D8%A8%D8%A7%D8%B1%D8%A7%D9%86_%D8%B4%DB%8C%D9%85%DB%8C%D8%A7%DB%8C%DB%8C_%D8%B3%D8%B1%D8%AF%D8%B4%D8%AA"
+  }
+ },
+ "Operation Shining Sun": {
+  "title": "Operation Shining Sun",
+  "url": "https://en.wikipedia.org/wiki/Operation_Shining_Sun",
+  "extract": "Operation Shining Sun, also known as Operation Sunshine or Operation Aftab, was the first major military operation of the National Liberation Army of Iran, the militant arm of the People's Mojahedin Organization of Iran. The goal of the leftist organization was to overthrow the Khomeini regime."
  }
 }

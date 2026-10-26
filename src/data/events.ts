@@ -51,8 +51,8 @@ export const EVENTS: WarEvent[] = [
 
   // ── 1980 ────────────────────────────────────────────────────────────────────────
   {
-    id: 'invasion', date: '1980-09-22', name: 'Iraqi invasion of Iran', fa: 'تهاجم عراق به ایران', kind: 'operation', side: 'iraq', outcome: 'iraq',
-    summary: 'Iraqi aircraft strike ten Iranian air bases, then six divisions cross on three fronts. The main effort is Khuzestan, with its Arab minority and oil; northern thrusts take Qasr-e Shirin, Sumar and Mehran to shield Baghdad. The air strikes fail to destroy Iran\'s air force, which was sheltered in hardened bunkers.',
+    id: 'invasion', date: '1980-09-22', name: 'Iraqi invasion of Iran', fa: 'تهاجم عراق به ایران', ar: 'قادسية صدام', kind: 'operation', side: 'iraq', outcome: 'iraq',
+    summary: 'Iraqi aircraft strike ten Iranian air bases, then six divisions cross on a 644 km front. Four go into Khuzestan — oil, an Arab minority Baghdad hoped would rise, and the Shatt — to besiege Khorramshahr and Abadan and screen Ahvaz, Susangerd and Dezful. Two more take Mehran and the ground in front of Qasr-e Shirin to block the old invasion route toward Baghdad. Iraq\'s propaganda named the war "Saddam\'s Qadisiyyah", after the 7th-century Arab victory over Persia. The air strikes fail: Iran\'s jets were sheltered in hardened bunkers.',
     wiki: 'Iraqi invasion of Iran',
     arrows: [
       { side: 'iraq', kind: 'air', path: [BAGHDAD, [48.0, 35.3], TEHRAN], label: 'Air strike: Mehrabad' },
@@ -184,7 +184,7 @@ export const EVENTS: WarEvent[] = [
   },
   {
     id: 'ramadan', date: '1982-07-13', end: '1982-08-03', name: 'Operation Ramadan', fa: 'عملیات رمضان', kind: 'operation', side: 'iran', outcome: 'iraq',
-    summary: 'Iran\'s first invasion of Iraq aims at Basra. Human-wave attacks run into prepared Iraqi defences — berms, minefields, flooded ground and massed artillery — and the offensive stalls after heavy losses.',
+    summary: 'Iran\'s first invasion of Iraq aims at Basra. Now defending its own soil, Iraq has rebuilt its army on the Soviet model: three lines of berms, minefields and bunkers, flooded ground, and tanks held back to counter-attack. Human-wave attacks break into the first line and are then caught by artillery, gunships and armour; the offensive stalls after heavy losses. This is Iraq\'s pattern for the next five years.',
     wiki: 'Operation Ramadan',
     arrows: [
       { side: 'iran', path: [[48.0, 30.52], [47.92, 30.55], [47.85, 30.52]], label: 'Shalamcheh axis' },
@@ -307,17 +307,20 @@ export const EVENTS: WarEvent[] = [
     places: ['faw', 'abadan', 'ummqasr', 'basra'], focus: [47.75, 29.75, 48.75, 30.55], refs: ['razoux', 'murray-woods', 'woods-saddam'],
   },
   {
-    id: 'mehran-1986', date: '1986-05-17', name: 'Iraq takes Mehran', kind: 'battle', side: 'iraq', outcome: 'iraq',
-    summary: 'Iraq seizes Mehran, hoping to swap it for Faw. Iran refuses to negotiate.',
+    id: 'mehran-1986', date: '1986-05-15', end: '1986-05-19', name: 'Iraq takes Mehran ("Dynamic Defence")', ar: 'الدفاع المتحرك', kind: 'battle', side: 'iraq', outcome: 'iraq',
+    summary: 'Answering the loss of Faw, Saddam announces an offensive policy he calls "Dynamic Defence". Iraq\'s II Corps, with helicopter gunships, takes Mehran — for the third time in the war — and Baghdad offers to swap it for Faw. Iran refuses; Iraqi attempts to push deeper are broken up by Iranian Cobra helicopters with TOW missiles.',
     wiki: 'Battle of Mehran',
-    arrows: [{ side: 'iraq', path: [[45.92, 32.98], [46.06, 33.06], [46.2, 33.14]] }],
-    places: ['mehran'], focus: [45.75, 32.85, 46.55, 33.45], refs: ['razoux'],
+    arrows: [{ side: 'iraq', path: [[45.92, 32.98], [46.06, 33.06], [46.2, 33.14]], label: 'II Corps' }],
+    places: ['mehran', 'badra'], focus: [45.75, 32.85, 46.55, 33.45], refs: ['razoux', 'murray-woods'],
   },
   {
     id: 'karbala1', date: '1986-06-30', end: '1986-07-09', name: 'Operation Karbala-1', fa: 'عملیات کربلای ۱', kind: 'operation', side: 'iran', outcome: 'iran',
-    summary: 'Iran recaptures Mehran and the heights around it within days.',
+    summary: 'Iran recaptures Mehran and the heights around it within days. Saddam sends the Republican Guard to retake it on 4 July; the attack fails with heavy losses, and Iraq cannot mount another major offensive for almost two years.',
     wiki: 'Operation Karbala-1',
-    arrows: [{ side: 'iran', path: [[46.36, 33.26], [46.2, 33.15], [46.02, 33.05]] }],
+    arrows: [
+      { side: 'iran', path: [[46.36, 33.26], [46.2, 33.15], [46.02, 33.05]] },
+      { side: 'iraq', kind: 'counter', path: [[45.88, 32.96], [46.06, 33.05]], label: 'Republican Guard' },
+    ],
     places: ['mehran'], focus: [45.75, 32.85, 46.55, 33.45], refs: ['razoux'],
   },
   {
@@ -331,12 +334,13 @@ export const EVENTS: WarEvent[] = [
   // ── 1987 ────────────────────────────────────────────────────────────────────────
   {
     id: 'karbala5', date: '1987-01-09', end: '1987-02-26', name: 'Operation Karbala-5', fa: 'عملیات کربلای ۵', kind: 'operation', side: 'iran', outcome: 'stalemate',
-    summary: 'Iran\'s biggest assault on Basra fights through Fish Lake\'s fortified lines from Shalamcheh and gets within about 12 km of the city. Losses on both sides are enormous; Basra holds.',
+    summary: 'Iran\'s biggest assault on Basra fights through Fish Lake\'s fortified lines from Shalamcheh and gets within about 12 km of the city. Iraq throws in every heavy weapon and, from mid-January, its full air force — over 500 sorties in two days — and although Iran breaks through four defence lines, it is stopped about 15 km from the city. Losses are enormous on both sides; the area becomes known as the "Somme" of the war.',
     wiki: 'Operation Karbala-5',
     arrows: [
       { side: 'iran', path: [[48.03, 30.56], [47.98, 30.58], [47.93, 30.56]], label: 'Fish Lake' },
       { side: 'iran', path: [[48.03, 30.46], [47.97, 30.47], [47.92, 30.49]], label: 'Jassim river' },
       { side: 'iraq', kind: 'counter', path: [[47.82, 30.5], [47.9, 30.5]] },
+      { side: 'iraq', kind: 'air', path: [[47.3, 30.9], [47.7, 30.75], [47.98, 30.55]], label: 'Air support' },
     ],
     places: ['basra', 'shalamcheh', 'khorramshahr'], focus: [47.7, 30.3, 48.25, 30.75], refs: ['razoux', 'murray-woods'],
   },
@@ -387,8 +391,8 @@ export const EVENTS: WarEvent[] = [
     places: ['halabja', 'kirkuk'], focus: [44.2, 34.9, 46.5, 35.8], refs: ['hrw-anfal'],
   },
   {
-    id: 'faw-2', date: '1988-04-17', end: '1988-04-18', name: 'Second Battle of al-Faw', kind: 'operation', side: 'iraq', outcome: 'iraq',
-    summary: 'In about 35 hours, the Republican Guard and VII Corps retake Faw with heavy use of nerve gas and an amphibious hook. Iran\'s defence collapses — the start of a run of Iraqi victories.',
+    id: 'faw-2', date: '1988-04-17', end: '1988-04-18', name: 'Operation Ramadan Mubarak (Second Battle of al-Faw)', ar: 'رمضان مبارك', kind: 'operation', side: 'iraq', outcome: 'iraq',
+    summary: 'Planned in secret for two years by a handful of officers with Saddam, and rehearsed on full-size mock-ups in the desert: over 100,000 troops, about 60% Republican Guard, against some 15,000 Iranian volunteers. Diversionary attacks in the north, then a barrage of nerve and mustard gas, heliborne commandos behind the lines and an amphibious hook. Faw falls in a day and a half — the first of the "Tawakalna ala Allah" victories.',
     wiki: 'Second Battle of al-Faw',
     arrows: [
       { side: 'iraq', path: [[48.02, 30.2], [48.22, 30.1], [48.42, 29.98]], label: 'VII Corps' },
@@ -398,8 +402,8 @@ export const EVENTS: WarEvent[] = [
     places: ['faw', 'ummqasr'], focus: [47.75, 29.75, 48.75, 30.45], refs: ['woods-saddam', 'murray-woods', 'razoux'],
   },
   {
-    id: 'tawakalna1', date: '1988-05-25', name: 'Tawakalna ala Allah: Shalamcheh', kind: 'operation', side: 'iraq', outcome: 'iraq',
-    summary: 'Iraq clears the ground east of Basra won by Iran in Karbala-5 in a single day and pushes back to Shalamcheh.',
+    id: 'tawakalna1', date: '1988-05-25', name: 'Tawakalna ala Allah 1: Fish Lake & Shalamcheh', ar: 'توكلنا على الله ١', kind: 'operation', side: 'iraq', outcome: 'iraq',
+    summary: 'One of the largest artillery barrages in history, with gas, opens a 15-mile attack by the Republican Guard and III Corps. The marshes have dried, so Iraqi tanks bypass the Iranian fieldworks; in under ten hours the ground Iran paid for in Karbala-5 is gone and Iran is pushed back over the border.',
     wiki: 'Tawakalna ala Allah Operations',
     arrows: [
       { side: 'iraq', path: [[47.88, 30.52], [47.97, 30.52], [48.05, 30.52]] },
@@ -415,12 +419,13 @@ export const EVENTS: WarEvent[] = [
     places: ['mehran'], focus: [45.75, 32.85, 46.55, 33.45], refs: ['razoux'],
   },
   {
-    id: 'majnoon-retaken', date: '1988-06-25', name: 'Tawakalna ala Allah: Majnoon', kind: 'operation', side: 'iraq', outcome: 'iraq',
-    summary: 'Iraq retakes the Majnoon Islands and the Hawizeh marshes in hours.',
+    id: 'majnoon-retaken', date: '1988-06-25', name: 'Tawakalna ala Allah 2: Majnoon', ar: 'توكلنا على الله ٢', kind: 'operation', side: 'iraq', outcome: 'iraq',
+    summary: 'After rehearsing on mock-ups of the islands, the Republican Guard crosses by amphibious vehicles and boats at 3:30 a.m. behind a gas barrage, throws pontoon bridges over and clears both islands in about eight hours while III Corps and hovercraft commandos cut them off from the mainland.',
     wiki: 'Tawakalna ala Allah Operations',
     arrows: [
       { side: 'iraq', path: [[47.4, 31.0], [47.53, 31.05], [47.66, 31.1]] },
-      { side: 'iraq', path: [[47.42, 31.25], [47.58, 31.2]] },
+      { side: 'iraq', kind: 'naval', path: [[47.42, 31.25], [47.58, 31.2]], label: 'Amphibious' },
+      { side: 'iraq', path: [[47.62, 30.88], [47.75, 30.98], [47.78, 31.1]], label: 'III Corps' },
     ],
     places: ['majnoon', 'qurna'], focus: [47.2, 30.85, 47.95, 31.4], refs: ['woods-saddam'],
   },
@@ -435,14 +440,28 @@ export const EVENTS: WarEvent[] = [
     wiki: 'United Nations Security Council Resolution 598', places: ['tehran'], refs: ['unsc-598', 'razoux'],
   },
   {
-    id: 'iraq-july88', date: '1988-07-22', name: 'Final Iraqi push into Iran', kind: 'operation', side: 'iraq', outcome: 'iraq',
-    summary: 'Iraq strikes into Khuzestan and near Dehloran to grab prisoners and bargaining chips before the ceasefire, then pulls most units back.',
+    id: 'tawakalna34', date: '1988-07-12', end: '1988-07-13', name: 'Tawakalna ala Allah 3 & 4: back into Iran', ar: 'توكلنا على الله ٣–٤', kind: 'operation', side: 'iraq', outcome: 'iraq',
+    summary: 'About five divisions, Republican Guard and IV Corps, overrun Iran\'s last positions on Iraqi soil at the Zubaidat oil fields east of Amarah within hours, then keep going. From Amarah they take Musian and Dehloran; from Khanaqin they take Naft-e Shahr, Sumar, Qasr-e Shirin and Sarpol-e Zahab. Thousands of Iranian prisoners and much armour are captured. The aim is to force Tehran to accept the UN ceasefire.',
     wiki: 'Tawakalna ala Allah Operations',
     arrows: [
-      { side: 'iraq', path: [[47.1, 32.42], [47.27, 32.62], [47.45, 32.74]], label: 'Dehloran' },
-      { side: 'iraq', path: [[47.6, 31.3], [47.92, 31.3], [48.12, 31.2]], label: 'Khuzestan' },
+      { side: 'iraq', path: [[47.05, 32.38], [47.2, 32.5], [47.27, 32.67]], label: 'IV Corps: Dehloran' },
+      { side: 'iraq', path: [[47.15, 32.3], [47.38, 32.5]], label: 'Musian' },
+      { side: 'iraq', path: [[45.36, 34.36], [45.58, 34.5], [45.84, 34.45]], label: 'Qasr-e Shirin → Sarpol' },
+      { side: 'iraq', path: [[45.3, 34.05], [45.48, 34.03]] },
+      { side: 'iraq', path: [[45.3, 33.85], [45.62, 33.86]], label: 'Sumar' },
     ],
-    places: ['dehloran', 'hoveyzeh', 'ahvaz'], focus: [46.7, 30.6, 48.8, 33.0], refs: ['woods-saddam', 'murray-woods'],
+    places: ['dehloran', 'musian', 'amarah', 'qasreshirin', 'sarpolezahab', 'sumar', 'naftshahr', 'khanaqin'], focus: [45.0, 32.2, 47.9, 34.8], refs: ['woods-saddam', 'murray-woods'],
+  },
+  {
+    id: 'iraq-july88', date: '1988-07-22', name: 'Last Iraqi thrust into Khuzestan', kind: 'operation', side: 'iraq', outcome: 'iraq',
+    summary: 'Even after Iran accepts the ceasefire, Iraqi armour drives into Khuzestan, cuts the Ahvaz–Khorramshahr highway and reaches crossings on the Karkheh, taking more prisoners as bargaining chips. Baghdad then pulls back from the towns, saying it has no wish to hold Iranian land.',
+    wiki: 'Tawakalna ala Allah Operations',
+    arrows: [
+      { side: 'iraq', path: [[47.6, 31.3], [47.95, 31.28], [48.2, 31.15], [48.35, 31.0]], label: 'Ahvaz–Khorramshahr road' },
+      { side: 'iraq', path: [[47.75, 30.68], [48.05, 30.75], [48.3, 30.82]] },
+      { side: 'iraq', path: [[47.65, 31.62], [47.95, 31.62], [48.15, 31.68]], label: 'Karkheh' },
+    ],
+    places: ['hoveyzeh', 'ahvaz', 'khorramshahr', 'susangerd'], focus: [47.4, 30.4, 48.8, 31.9], refs: ['woods-saddam', 'murray-woods'],
   },
   {
     id: 'mersad', date: '1988-07-26', end: '1988-07-29', name: 'Forough Javidan & Operation Mersad', fa: 'عملیات مرصاد', kind: 'operation', side: 'iran', outcome: 'iran',
@@ -459,6 +478,67 @@ export const EVENTS: WarEvent[] = [
     id: 'ceasefire', date: '1988-08-20', name: 'Ceasefire', fa: 'آتش‌بس', kind: 'political',
     summary: 'The guns fall silent. UNIIMOG observers deploy along roughly 1,400 km of front. Estimates of the dead run from several hundred thousand to over a million; the border is unchanged.',
     wiki: 'United Nations Iran–Iraq Military Observer Group', places: ['tehran', 'baghdad'], focus: [44.2, 29.9, 51.6, 37.5], refs: ['unsc-598', 'murray-woods'],
+  },
+
+  // ── Iraqi operations and defensive battles ───────────────────────────────────
+  {
+    id: 'enclaves-1980', date: '1980-09-10', name: 'Iraq seizes the border enclaves', kind: 'operation', side: 'iraq', outcome: 'iraq',
+    summary: 'Before the invasion, Iraqi divisions take Zain al-Qaws near Khanaqin, Saif Saad, and a strip between Shib and Fakkeh — land the 1975 agreement had promised Iraq but never handed over. On 10 September Saddam declares all disputed territory "liberated"; a week later he tears up the agreement.',
+    wiki: 'Iraqi invasion of Iran',
+    arrows: [
+      { side: 'iraq', path: [[45.36, 34.3], [45.46, 34.24], [45.53, 34.17]], label: 'Zain al-Qaws (6th Armd)' },
+      { side: 'iraq', path: [[47.5, 32.28], [47.62, 32.18], [47.72, 32.1]], label: 'Shib–Fakkeh (1st Mech)' },
+    ],
+    places: ['khanaqin', 'naftshahr', 'fakkeh'], focus: [45.0, 31.8, 48.1, 34.6], refs: ['woods-saddam', 'razoux'],
+  },
+  {
+    id: 'dezful-1980', date: '1980-10-14', end: '1980-10-16', name: 'Battle of Dezful', kind: 'battle', side: 'iran', outcome: 'iraq',
+    summary: 'With Iraqi guns shelling Dezful, an Iranian armoured brigade and Revolutionary Guard infantry attack the Iraqi 10th Armoured Division. Its 42nd Armoured Brigade gives ground in good order onto a prepared killing area, and BMPs with Sagger missiles hit the Iranian tanks from the flank at 100–150 m. Iran abandons 84 tanks and dozens of other vehicles.',
+    wiki: 'Operation Dezful',
+    arrows: [
+      { side: 'iran', path: [[48.36, 32.4], [48.22, 32.36], [48.08, 32.34]], label: 'Iranian 92nd Div.' },
+      { side: 'iraq', kind: 'retreat', path: [[48.1, 32.34], [47.98, 32.33]] },
+      { side: 'iraq', kind: 'counter', path: [[47.98, 32.47], [48.1, 32.39]], label: '24th Mech. Bde' },
+      { side: 'iraq', kind: 'counter', path: [[47.98, 32.22], [48.09, 32.3]] },
+    ],
+    places: ['dezful', 'andimeshk', 'shush'], focus: [47.75, 32.05, 48.6, 32.6], refs: ['woods-saddam', 'pollack'],
+  },
+  {
+    id: 'susangerd-1980', date: '1980-11-19', name: 'Susangerd: Iraqi encirclement broken', kind: 'battle', side: 'iran', outcome: 'iran',
+    summary: 'In November Saddam orders his army to close on Dezful and Ahvaz, and Iraqi armour nearly encircles Susangerd — probably the first place Iraq used chemical weapons. On 19 November a joint army, Revolutionary Guard and irregular force, with heavy air support, breaks the ring. Short of reserves, Iraq\'s offensive is spent.',
+    wiki: 'Liberation of Susangerd',
+    arrows: [
+      { side: 'iraq', path: [[47.98, 31.72], [48.1, 31.64], [48.17, 31.6]], label: 'From Bostan' },
+      { side: 'iraq', path: [[48.06, 31.46], [48.14, 31.52], [48.18, 31.54]] },
+      { side: 'iran', kind: 'counter', path: [[48.43, 31.5], [48.3, 31.54], [48.21, 31.56]], label: 'Relief force' },
+    ],
+    places: ['susangerd', 'bostan', 'hamidiyeh', 'hoveyzeh'], focus: [47.85, 31.35, 48.55, 31.8], refs: ['razoux', 'pollack'],
+  },
+  {
+    id: 'iraq-defensive', date: '1980-12-07', name: 'Iraq goes on the defensive', kind: 'political', side: 'iraq',
+    summary: 'With its strategic reserves used up, Saddam announces that Iraq will hold what it has taken. Iraqi tanks are dug into static positions and the war settles into trenches and artillery duels; Iraq begins firing missiles at Dezful and Ahvaz.',
+    wiki: 'Iran–Iraq War', places: ['baghdad', 'dezful', 'ahvaz'], refs: ['murray-woods', 'woods-saddam'],
+  },
+  {
+    id: 'majnoon-1986', date: '1986-01-06', name: 'Iraqi attack on Majnoon', kind: 'operation', side: 'iraq', outcome: 'stalemate',
+    summary: 'For the first time in years Iraq attacks: it tries to retake the Majnoon Islands, bogs down against Iranian infantry and amphibious units, but gains a foothold on the southern island.',
+    wiki: 'Iran–Iraq War',
+    arrows: [{ side: 'iraq', path: [[47.4, 30.96], [47.52, 31.0], [47.6, 31.03]] }],
+    places: ['majnoon', 'qurna'], focus: [47.2, 30.85, 47.95, 31.35], refs: ['murray-woods'],
+  },
+  {
+    id: 'sardasht', date: '1987-06-28', name: 'Chemical bombing of Sardasht', fa: 'بمباران شیمیایی سردشت', kind: 'atrocity', side: 'iraq',
+    summary: 'Iraqi aircraft drop mustard gas on four residential areas of Sardasht, an Iranian Kurdish town. 130 people die and about 8,000 are injured; many survivors are still sick decades later.',
+    wiki: 'Chemical bombing of Sardasht',
+    arrows: [{ side: 'iraq', kind: 'air', path: [[44.39, 35.47], [45.0, 36.0], [45.48, 36.15]], label: 'From Kirkuk' }],
+    places: ['sardasht', 'kirkuk'], focus: [44.2, 35.2, 46.2, 36.6], refs: ['razoux'],
+  },
+  {
+    id: 'shining-sun', date: '1988-03-28', name: 'Operation Shining Sun (MEK)', fa: 'عملیات آفتاب', kind: 'operation', side: 'other', outcome: 'iraq',
+    summary: 'The first big attack by the MEK\'s "National Liberation Army", based in and armed by Iraq: it overruns Iranian positions in the Fakkeh sector astride the Dezful–Amarah road and takes prisoners and equipment (the MEK claimed 600 km²).',
+    wiki: 'Operation Shining Sun',
+    arrows: [{ side: 'other', path: [[47.55, 32.02], [47.75, 32.07], [47.95, 32.13]], label: 'MEK' }],
+    places: ['fakkeh', 'shush', 'amarah'], focus: [47.2, 31.8, 48.4, 32.5], refs: ['razoux'],
   },
 
   // ── After ───────────────────────────────────────────────────────────────────────

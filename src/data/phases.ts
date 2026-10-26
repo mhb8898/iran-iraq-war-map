@@ -113,8 +113,13 @@ export const PHASES: Phase[] = [
     note: 'Iran\'s hold in the south is gone.',
   },
   {
+    id: 'iraq-into-iran', date: '1988-07-13', label: 'Iraq back inside Iran',
+    iraqHeld: ['1988-dehloran', '1988-central'], iranHeld: ['hajomran'], contested: ['kurdistan-irq', 'halabja'],
+    note: 'Tawakalna 3 & 4 clear Iran from Iraqi soil and seize Dehloran, Musian, Sumar, Naft-e Shahr, Qasr-e Shirin and Sarpol-e Zahab.',
+  },
+  {
     id: 'iraq-july88', date: '1988-07-25', label: 'Last Iraqi offensives',
-    iraqHeld: ['1988-dehloran', '1988-khuz'], iranHeld: ['hajomran'], contested: ['kurdistan-irq', 'central-enclave', '1988-mersad', 'halabja'],
+    iraqHeld: ['1988-dehloran', '1988-central', '1988-khuz'], iranHeld: ['hajomran'], contested: ['kurdistan-irq', '1988-mersad', 'halabja'],
     note: 'After Iran accepts Resolution 598, Iraq strikes into Iran one more time and the MEK drives on Kermanshah.',
   },
   {

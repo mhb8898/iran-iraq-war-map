@@ -9,9 +9,11 @@ flies to it, draws the axes of attack, and redraws the lines of control as they 
   Iranian-held Iraqi soil hatched green, and areas that neither side fully controlled
   (Kurdish insurgencies, the Hawizeh marshes, no-man's-land belts) are gray. *Compare with
   today's border* adds a swipe divider; the panel shows the occupied area in km².
-- **Operations as movement.** 55 events: invasions, offensives, air and missile campaigns,
+- **Operations as movement.** 63 events from both sides: invasions, offensives and the defensive battles that stopped them, air and missile campaigns,
   naval strikes, atrocities and diplomacy, each with Persian names, dates, outcome, a lead
-  photo and extract from Wikipedia (English and Persian links), and book/UN references.
+  photo and extract from Wikipedia (English and Persian links), and book/UN references. Iraqi
+  operations carry their Arabic code names (Ramadan Mubarak, Tawakalna ala Allah…), and a
+  Both / Iran / Iraq switch on the timeline shows one side's war at a time.
 - **Terrain.** Shaded relief rendered in Blender from open elevation data, sliced into
   zoom tiles so it stays sharp down to individual ridgelines.
 

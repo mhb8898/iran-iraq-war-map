@@ -48,6 +48,7 @@ export function renderEvent(el: HTMLElement, ev: WarEvent, wiki: Wiki, ctx: Pane
       </div>
       <h2>${esc(ev.name)}</h2>
       ${ev.fa ? `<div class="fa-title" dir="rtl" lang="fa">${esc(ev.fa)}</div>` : ''}
+      ${ev.ar ? `<div class="ar-title"><span>Iraqi name</span><b dir="rtl" lang="ar">${esc(ev.ar)}</b></div>` : ''}
       <div class="dates">${dates}</div>
       <p class="summary">${esc(ev.summary)}</p>
       ${ev.arrows?.length ? `<button class="replay" type="button">↻ Replay the movement</button>` : ''}

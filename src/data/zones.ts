@@ -49,13 +49,18 @@ export const ZONES: Zone[] = [
   },
   {
     id: '1988-khuz', on: 'IRN', label: 'July 1988 Iraqi thrust (Khuzestan)',
-    note: 'Iraqi armour re-entered Khuzestan on 22 July and pulled back within days.',
-    shape: [[47.5, 30.5], [48.05, 30.55], [48.2, 30.9], [48.15, 31.35], [47.95, 31.6], [47.5, 31.6]],
+    note: 'Iraqi armour re-entered Khuzestan on 22 July, cut the Ahvaz–Khorramshahr road and reached the Karkheh, then pulled back within days.',
+    shape: [[47.5, 30.5], [48.05, 30.55], [48.3, 30.75], [48.4, 31.0], [48.35, 31.2], [48.18, 31.45], [48.12, 31.7], [47.5, 31.75]],
+  },
+  {
+    id: '1988-central', on: 'IRN', label: 'July 1988 Iraqi thrust (Qasr-e Shirin)',
+    note: 'Naft-e Shahr, Sumar, Qasr-e Shirin and Sarpol-e Zahab taken in mid-July; Iraq left the towns after Iran accepted the ceasefire.',
+    shape: [[45.3, 33.72], [45.75, 33.72], [45.8, 34.0], [45.95, 34.3], [45.98, 34.52], [45.7, 34.7], [45.4, 34.72], [45.25, 34.2]],
   },
   {
     id: '1988-mersad', on: 'IRN', label: 'MEK "Forough-e Javidan" corridor',
     note: 'The MEK column drove from Qasr-e Shirin toward Kermanshah and was destroyed at Charzebar pass (Operation Mersad).',
-    shape: [[45.45, 34.42], [45.9, 34.33], [46.5, 34.03], [46.62, 34.14], [45.95, 34.56], [45.45, 34.64]],
+    shape: [[45.95, 34.32], [46.5, 34.03], [46.62, 34.14], [45.99, 34.55]],
   },
 
   // ── Iranian-held, Iraqi soil ─────────────────────────────────────────────────────
