@@ -217,9 +217,29 @@ async function main() {
   ];
   document.getElementById('legend-sites')!.innerHTML = LEGEND_SITES.map(([k, side, text]) =>
     `<li><svg class="lg-site" viewBox="-11 -9 22 18"><g class="site k-${k} side-${side}"><g class="glyph">${SITE_GLYPH[k].replace(/V15/, 'V9')}</g></g></svg>${text}</li>`).join('');
-  // the legend and the overview share the left column; on short screens the legend starts folded
-  if (!isPhone() && window.innerHeight < 960) document.getElementById('legend')!.classList.add('collapsed');
-  document.getElementById('legend-toggle')!.onclick = () => document.getElementById('legend')!.classList.toggle('collapsed');
+  // the legend and the overview share the left column and each folds to its title; the choice is
+  // remembered, and with nothing remembered the legend starts folded on short screens
+  const fold = (id: 'legend' | 'overview', byDefault: boolean) => {
+    const el = document.getElementById(id)!;
+    const key = `fold:${id}`;
+    let saved: string | null = null;
+    try {
+      saved = localStorage.getItem(key);
+    } catch {
+      // storage blocked: fall back to the default
+    }
+    el.classList.toggle('collapsed', !isPhone() && (saved ? saved === '1' : byDefault));
+    document.getElementById(`${id}-toggle`)!.onclick = () => {
+      const on = el.classList.toggle('collapsed');
+      try {
+        localStorage.setItem(key, on ? '1' : '0');
+      } catch {
+        // not remembered this time
+      }
+    };
+  };
+  fold('legend', window.innerHeight < 960);
+  fold('overview', false);
   window.addEventListener('keydown', (ev) => {
     if ((ev.target as HTMLElement).tagName === 'INPUT') return;
     if (ev.key === 'ArrowRight') (stop(), step(1));

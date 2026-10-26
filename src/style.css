@@ -158,17 +158,23 @@ a { color: #8a3b12; }
 .sbtn.star:hover { background: #b8952e; color: #fff; }
 #star-count:not(:empty) { margin-left: 2px; padding-left: 6px; border-left: 1px solid currentColor; font-variant-numeric: tabular-nums; }
 
-.left-col { position: absolute; left: 16px; top: 192px; width: 268px; display: flex; flex-direction: column; gap: 10px; max-height: calc(100% - 192px - var(--dock-h) - 16px); }
+.left-col { position: absolute; left: 16px; top: 192px; width: 216px; display: flex; flex-direction: column; gap: 10px; max-height: calc(100% - 192px - var(--dock-h) - 16px); }
 #legend {
-  padding: 10px 14px 12px; font-size: 12.5px;
+  padding: 8px 11px 10px; font-size: 12px;
   background: color-mix(in srgb, var(--paper-2) 92%, transparent); border: 1px solid var(--rule); border-radius: 4px;
   box-shadow: 0 8px 24px rgba(40, 30, 15, 0.15);
 }
-#legend-toggle { all: unset; cursor: pointer; font: 700 11px var(--sans); letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-2); }
-#legend-toggle::after { content: ' ▾'; }
+/* the legend's and the overview's titles fold their card away */
+.fold-toggle, #legend-toggle { all: unset; cursor: pointer; font: 700 10.5px var(--sans); letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-2); }
+.fold-toggle:hover, #legend-toggle:hover { color: var(--ink); }
+.fold-toggle:focus-visible, #legend-toggle:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+#legend-toggle::after, .fold-toggle::after { content: ' ▾'; }
+#overview.collapsed .ov-svg, #overview.collapsed .ov-ledger { display: none; }
+#overview.collapsed .ov-head { margin-bottom: 0; }
+#overview.collapsed .fold-toggle::after { content: ' ▸'; }
 #legend.collapsed ul, #legend.collapsed .caveat, #legend.collapsed .compare { display: none; }
 #legend.collapsed #legend-toggle::after { content: ' ▸'; }
-#legend ul { list-style: none; margin: 8px 0 8px; padding: 0; display: grid; gap: 5px; }
+#legend ul { list-style: none; margin: 6px 0; padding: 0; display: grid; gap: 4px; }
 #legend li { display: flex; align-items: center; gap: 8px; }
 .compare { display: flex; gap: 8px; align-items: center; font-weight: 600; padding: 7px 0 3px; border-top: 1px solid var(--rule); cursor: pointer; }
 .compare input { accent-color: var(--ink); width: 16px; height: 16px; }
@@ -195,7 +201,7 @@ a { color: #8a3b12; }
 
 /* overview locator */
 #overview {
-  padding: 8px 8px 6px;
+  padding: 7px 8px 6px;
   background: color-mix(in srgb, var(--paper-2) 94%, transparent); border: 1px solid var(--rule); border-radius: 4px;
   box-shadow: 0 8px 24px rgba(40, 30, 15, 0.18); transition: right 0.35s;
 }
@@ -350,6 +356,9 @@ a { color: #8a3b12; }
   .sbtn { font-size: 13px; padding: 7px 10px; text-align: left; }
   #legend-toggle { display: none; }
   #legend.collapsed ul, #legend.collapsed .caveat, #legend.collapsed .compare { display: revert; }
+  .fold-toggle { pointer-events: none; }
+  .fold-toggle::after { content: none; }
+  #overview.collapsed .ov-svg, #overview.collapsed .ov-ledger { display: revert; }
   #legend ul { margin-top: 0; }
   #overview { right: auto; width: min(260px, calc(100% - 64px)); }
   .ov-city-label { display: none; }

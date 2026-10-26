@@ -17,7 +17,7 @@ export class Overview {
 
   constructor(host: HTMLElement, geo: Base, onPick: (p: LonLat) => void) {
     const W = 250, H = 300;
-    host.innerHTML = '<div class="ov-head"><span>Whole front</span><b id="ov-date"></b></div>';
+    host.innerHTML = '<div class="ov-head"><button id="overview-toggle" type="button" class="fold-toggle" aria-label="Show or hide the overview map">Whole front</button><b id="ov-date"></b></div>';
     this.caption = document.createElement('div');
     this.caption.className = 'ov-ledger';
     const [w, s, e, n] = THEATRE;
