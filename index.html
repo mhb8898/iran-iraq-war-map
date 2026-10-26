@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Iran–Iraq War Map</title>
+    <meta name="description" content="Lines of control in the Iran–Iraq War, operation by operation, against today's border." />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23efe6d2'/%3E%3Cpath d='M5 22 L13 12 L19 18 L27 8' stroke='%23b3262c' stroke-width='3.5' fill='none'/%3E%3Cpath d='M27 8 l-6 1 l5 5z' fill='%23b3262c'/%3E%3C/svg%3E" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=IBM+Plex+Sans+Condensed:wght@400;500;600&family=Vazirmatn:wght@400;600&display=swap" rel="stylesheet" />
+  </head>
+  <body>
+    <main class="app">
+      <div id="map" data-panel="closed"></div>
+
+      <header class="masthead">
+        <div class="eyebrow">1937 · 1975 · <b>1980 – 1988</b> · 1990</div>
+        <h1>The Iran–Iraq War</h1>
+        <div class="fa-h1" dir="rtl" lang="fa">جنگ ایران و عراق · ۱۳۵۹–۱۳۶۷</div>
+        <div class="phase-pill"><span class="dot"></span><span id="phase-label"></span></div>
+      </header>
+
+      <aside id="legend">
+        <button id="legend-toggle" type="button" aria-label="Toggle legend">Legend</button>
+        <ul>
+          <li><i class="sw iraqHeld"></i>Iranian territory held by Iraq</li>
+          <li><i class="sw iranHeld"></i>Iraqi territory held by Iran</li>
+          <li><i class="sw contested"></i>Contested / not fully controlled</li>
+          <li><i class="ln intl"></i>International border (1975 = today)</li>
+          <li><i class="ar a-iran"></i>Iranian attack</li>
+          <li><i class="ar a-iraq"></i>Iraqi attack</li>
+          <li><i class="ar a-other"></i>MEK (Iraqi-backed)</li>
+          <li><i class="ar a-counter"></i>Counter-attack · <i class="ar a-retreat"></i>retreat</li>
+          <li><i class="ln air"></i>Air, missile or naval strike</li>
+        </ul>
+        <label class="compare"><input type="checkbox" id="compare" /> Compare with today's border</label>
+        <p class="caveat">Front lines are hand-drawn approximations (±5–10 km) from the cited histories. Click a shaded zone for details.</p>
+      </aside>
+
+      <aside id="panel" data-open="false">
+        <button id="close-panel" type="button" aria-label="Close panel">×</button>
+        <div id="card"></div>
+      </aside>
+
+      <div class="map-controls">
+        <button id="home" type="button" title="Show the whole front">⌂</button>
+      </div>
+
+      <footer class="dock">
+        <div class="transport">
+          <button id="prev" type="button" title="Previous event (←)">◀</button>
+          <button id="play" type="button" title="Play (space)">▶ Play</button>
+          <button id="next" type="button" title="Next event (→)">▶</button>
+        </div>
+        <div id="timeline"></div>
+      </footer>
+      <div id="tip" hidden></div>
+    </main>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
