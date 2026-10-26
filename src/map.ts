@@ -38,6 +38,7 @@ export class WarMap {
   private layers: { base: G; controlClip: G; control: G; top: G; overlay: G; arrows: G; places: G; labels: G; ui: G };
   private controlFeatures: ZoneFeature[] = [];
   private historic?: '1937';
+  private minK = 1;
   private highlighted = new Set<string>();
   arrows: ArrowState[] = [];
   private compareX: number | null = null;
@@ -70,7 +71,7 @@ export class WarMap {
     this.layers.ui = this.layers.overlay.append('g').attr('class', 'ui');
 
     this.zoomer = d3zoom<SVGSVGElement, unknown>()
-      .scaleExtent([0.8, 40])
+      .scaleExtent([1, 40])
       .on('zoom', (e) => {
         this.transform = e.transform;
         this.applyTransform();
@@ -125,7 +126,11 @@ export class WarMap {
     this.projection = geoMercator().fitExtent([[0, 0], [r.width, r.height]], { type: 'MultiPoint', coordinates: [[w, s], [w, n], [e, n], [e, s]] });
     this.drawBase();
     this.drawControl(this.controlFeatures, false);
-    this.zoomer.extent([[0, 0], [r.width, r.height]]).translateExtent([[-r.width * 0.2, -r.height * 0.2], [r.width * 1.2, r.height * 1.2]]);
+    // never zoom or pan past the edge of the mapped area
+    const [bx0, by0] = this.projection([w, n])!;
+    const [bx1, by1] = this.projection([e, s])!;
+    this.minK = Math.max(r.width / (bx1 - bx0), r.height / (by1 - by0));
+    this.zoomer.extent([[0, 0], [r.width, r.height]]).scaleExtent([this.minK, 40]).translateExtent([[bx0, by0], [bx1, by1]]);
     if (first) this.flyTo([44.2, 29.6, 50.2, 37.3], 0);
     this.applyTransform();
   }
@@ -475,7 +480,7 @@ export class WarMap {
     const rightInset = desktop && this.host.dataset.panel === 'open' ? 400 : 0;
     const bottomInset = !desktop && this.host.dataset.panel === 'open' ? this.height * 0.42 : 0;
     const vw = this.width - leftInset - rightInset - pad * 2, vh = this.height - bottomInset - pad * 2;
-    const k = Math.min(40, vw / (x1 - x0), vh / (y1 - y0));
+    const k = Math.max(this.minK, Math.min(40, vw / (x1 - x0), vh / (y1 - y0)));
     const tx = leftInset + pad + vw / 2 - (k * (x0 + x1)) / 2;
     const ty = pad + vh / 2 - (k * (y0 + y1)) / 2;
     const target = zoomIdentity.translate(tx, ty).scale(k);

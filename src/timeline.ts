@@ -73,8 +73,9 @@ export class Timeline {
     svg.append('path').attr('class', 'stream iraq').attr('d', up(ph));
     svg.append('path').attr('class', 'stream iran').attr('d', down(ph));
     svg.append('line').attr('class', 'axis').attr('x1', 0).attr('x2', r.width).attr('y1', mid).attr('y2', mid);
-    svg.append('text').attr('class', 'stream-label').attr('x', x(parseDate('1980-11-01')) + 4).attr('y', 10).text('Iranian soil held by Iraq');
-    svg.append('text').attr('class', 'stream-label').attr('x', x(parseDate('1984-03-15')) + 4).attr('y', mid + 22).text('Iraqi soil held by Iran');
+    // labels sit where the other stream is empty, clear of the cursor's date tag
+    svg.append('text').attr('class', 'stream-label').attr('x', x(parseDate('1983-01-01'))).attr('y', mid - 5).text('▲ Iranian soil held by Iraq');
+    svg.append('text').attr('class', 'stream-label').attr('x', x(parseDate('1981-01-01'))).attr('y', mid + 13).text('▼ Iraqi soil held by Iran');
 
     // year ticks
     const years: number[] = [1937, 1975];

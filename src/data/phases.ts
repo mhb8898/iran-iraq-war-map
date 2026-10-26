@@ -114,13 +114,13 @@ export const PHASES: Phase[] = [
   },
   {
     id: 'iraq-july88', date: '1988-07-25', label: 'Last Iraqi offensives',
-    iraqHeld: ['1988-dehloran', '1988-khuz', 'central-enclave'], iranHeld: ['hajomran'], contested: ['kurdistan-irq', '1988-mersad', 'halabja'],
+    iraqHeld: ['1988-dehloran', '1988-khuz'], iranHeld: ['hajomran'], contested: ['kurdistan-irq', 'central-enclave', '1988-mersad', 'halabja'],
     note: 'After Iran accepts Resolution 598, Iraq strikes into Iran one more time and the MEK drives on Kermanshah.',
   },
   {
     id: 'ceasefire', date: '1988-08-20', label: 'Ceasefire',
-    iraqHeld: ['central-enclave'], iranHeld: ['hajomran'], contested: ['kurdistan-irq'],
-    note: 'UN observers (UNIIMOG) deploy on the line of contact; both sides still hold pockets across the border.',
+    iraqHeld: [], iranHeld: ['hajomran'], contested: ['kurdistan-irq', 'central-enclave'],
+    note: 'UN observers (UNIIMOG) deploy on the line of contact. Both sides still hold pockets across the border; the central belt is shown gray because its extent is uncertain.',
   },
   {
     id: 'withdrawal', date: '1990-08-17', label: 'Back to the 1975 border',
