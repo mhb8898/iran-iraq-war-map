@@ -1,13 +1,14 @@
 // Bakes a shaded-relief backdrop for the theatre from AWS Terrain Tiles (Terrarium encoding,
 // open data: https://registry.opendata.aws/terrain-tiles/). Output is in Web Mercator pixel
 // space, so the SVG (d3.geoMercator) can place it as one <image> with no reprojection.
-//   public/relief.webp      tinted hillshade shown in the app
-//   scripts/.cache/height.png  16-bit heightmap (metres + 1000) for the Blender render
-//   public/data/relief.json   lon/lat bounds of both images
+//   scripts/.cache/relief-node.png  tinted hillshade (source for slice-tiles.mjs)
+//   scripts/.cache/tint.png         hypsometric colour only, no shading (Blender texture)
+//   scripts/.cache/height.png       16-bit heightmap, metres + 1000 (Blender displacement)
+//   scripts/.cache/relief.json      bounds, zoom and pixel size of all three
 import { mkdirSync, existsSync, writeFileSync, readFileSync } from 'node:fs';
 import sharp from 'sharp';
 
-const Z = 8;
+const Z = Number(process.env.Z ?? 9);
 const [W, S, E, N] = JSON.parse(readFileSync(new URL('../public/data/base.json', import.meta.url))).bbox;
 const tilesDir = new URL('./.cache/terrarium/', import.meta.url);
 mkdirSync(tilesDir, { recursive: true });
@@ -55,6 +56,7 @@ const tint = (e) => {
 };
 
 const rgb = Buffer.alloc(cw * ch * 3);
+const tintRgb = Buffer.alloc(cw * ch * 3);
 const height16 = Buffer.alloc(cw * ch * 2);
 const az = (315 * Math.PI) / 180, alt = (40 * Math.PI) / 180, zf = 3.2;
 for (let j = 0; j < ch; j++) {
@@ -70,12 +72,17 @@ for (let j = 0; j < ch; j++) {
     const shade = Math.max(0, Math.sin(alt) * Math.cos(slope) + Math.cos(alt) * Math.sin(slope) * Math.cos(Math.PI / 2 - az - aspect));
     const c = tint(e);
     const k = (j * cw + i) * 3;
-    for (let q = 0; q < 3; q++) rgb[k + q] = Math.max(0, Math.min(255, c[q] * (0.46 + 0.84 * shade)));
+    for (let q = 0; q < 3; q++) {
+      rgb[k + q] = Math.max(0, Math.min(255, c[q] * (0.46 + 0.84 * shade)));
+      tintRgb[k + q] = c[q];
+    }
     height16.writeUInt16BE(Math.max(0, Math.min(65535, Math.round(e + 1000))), (j * cw + i) * 2);
   }
 }
 
-await sharp(rgb, { raw: { width: cw, height: ch, channels: 3 } }).webp({ quality: 82 }).toFile(new URL('../public/relief.webp', import.meta.url).pathname);
-await sharp(height16, { raw: { width: cw, height: ch, channels: 1 } }).toColourspace('grey16').png().toFile(new URL('./.cache/height.png', import.meta.url).pathname);
-writeFileSync(new URL('../public/data/relief.json', import.meta.url), JSON.stringify({ bounds: [W, S, E, N], width: cw, height: ch }));
-console.log(`relief ${cw}x${ch} from ${cols * rows} tiles`);
+const cache = (f) => new URL(`./.cache/${f}`, import.meta.url).pathname;
+await sharp(rgb, { raw: { width: cw, height: ch, channels: 3 } }).png().toFile(cache('relief-node.png'));
+await sharp(tintRgb, { raw: { width: cw, height: ch, channels: 3 } }).png().toFile(cache('tint.png'));
+await sharp(height16, { raw: { width: cw, height: ch, channels: 1 } }).toColourspace('grey16').png().toFile(cache('height.png'));
+writeFileSync(cache('relief.json'), JSON.stringify({ bounds: [W, S, E, N], z: Z, width: cw, height: ch, minElev: -1000 }));
+console.log(`relief z${Z} ${cw}x${ch} from ${cols * rows} tiles`);

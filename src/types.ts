@@ -4,10 +4,17 @@ export type Side = 'iran' | 'iraq';
 /** A drawn area of control. `shape` is sketched loosely and overshoots the international
  *  border; it is clipped at runtime to the country named by `on`, so the edge that follows
  *  the border is exact and only the front-line edge is hand-drawn. */
+/** Follow a river's course between the points nearest to `from` and `to`. */
+export interface RiverEdge {
+  river: string;
+  from: LonLat;
+  to: LonLat;
+}
+
 export interface Zone {
   id: string;
   on: 'IRN' | 'IRQ';
-  shape: LonLat[];
+  shape: (LonLat | RiverEdge)[];
   label: string;
   note?: string;
 }

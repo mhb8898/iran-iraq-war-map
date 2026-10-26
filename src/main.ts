@@ -16,8 +16,10 @@ const DAY = 864e5;
 const events = [...EVENTS].sort((a, b) => a.date.localeCompare(b.date));
 const phaseAt = (d: Date): Phase => [...PHASES].reverse().find((p) => parseDate(p.date) <= d) ?? PHASES[0];
 const phaseBefore = (e: WarEvent) => [...PHASES].reverse().find((p) => p.date < e.date) ?? PHASES[0];
+// Ground fighting shows the front once it's over; long air/naval campaigns and political events show it as they began.
 const phaseAfter = (e: WarEvent) =>
-  (e.phase && PHASES.find((p) => p.id === e.phase)) || phaseAt(new Date(parseDate(e.end ?? e.date).getTime() + 7 * DAY));
+  (e.phase && PHASES.find((p) => p.id === e.phase)) ||
+  (e.kind === 'operation' || e.kind === 'battle' ? phaseAt(new Date(parseDate(e.end ?? e.date).getTime() + 7 * DAY)) : phaseAt(parseDate(e.date)));
 
 function focusOf(e: WarEvent): [number, number, number, number] {
   if (e.focus) return e.focus;

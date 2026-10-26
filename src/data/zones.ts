@@ -8,12 +8,12 @@ export const ZONES: Zone[] = [
   {
     id: 'khuz-karun-bridgehead', on: 'IRN', label: 'Iraqi bridgehead east of the Karun',
     note: 'Cut the Abadan–Ahvaz and Abadan–Mahshahr roads; Abadan held out, supplied over the Bahmanshir.',
-    shape: [[48.24, 30.47], [48.3, 30.45], [48.4, 30.48], [48.48, 30.56], [48.46, 30.66], [48.38, 30.7], [48.31, 30.66], [48.27, 30.56]],
+    shape: [{ river: 'Karun River', from: [48.33, 30.7], to: [48.22, 30.46] }, [48.3, 30.45], [48.4, 30.48], [48.48, 30.56], [48.46, 30.66], [48.38, 30.7]],
   },
   {
     id: 'khuz-south', on: 'IRN', label: 'Khorramshahr – Hoveyzeh sector',
     note: 'West bank of the Karun from Khorramshahr to ~15 km south-west of Ahvaz, Hamid garrison and Hoveyzeh.',
-    shape: [[47.4, 30.3], [48.12, 30.39], [48.2, 30.43], [48.24, 30.5], [48.27, 30.6], [48.32, 30.7], [48.38, 30.8], [48.45, 30.95], [48.52, 31.08], [48.58, 31.17], [48.45, 31.25], [48.4, 31.4], [48.36, 31.48], [48.25, 31.5], [48.14, 31.53], [48.1, 31.55], [47.4, 31.55]],
+    shape: [[47.4, 30.3], [48.12, 30.39], { river: 'Karun River', from: [48.19, 30.43], to: [48.45, 30.95] }, [48.52, 31.08], [48.58, 31.17], [48.45, 31.25], [48.4, 31.4], [48.36, 31.48], [48.25, 31.5], [48.14, 31.53], [48.1, 31.55], [47.4, 31.55]],
   },
   {
     id: 'khuz-bostan', on: 'IRN', label: 'Bostan – Allah-o Akbar heights',
@@ -23,7 +23,7 @@ export const ZONES: Zone[] = [
   {
     id: 'khuz-karkheh', on: 'IRN', label: 'West of the Karkheh (Shush – Dezful front)',
     note: 'Iraqi artillery here shelled Dezful, Andimeshk and the Dezful air base.',
-    shape: [[47.2, 31.95], [48.1, 31.9], [48.18, 32.05], [48.17, 32.2], [48.15, 32.32], [48.05, 32.42], [47.8, 32.46], [47.55, 32.42], [47.2, 32.35]],
+    shape: [[47.2, 31.95], [48.1, 31.9], { river: 'Karkheh River', from: [48.15, 32.0], to: [48.15, 32.32] }, [48.05, 32.42], [47.8, 32.46], [47.55, 32.42], [47.2, 32.35]],
   },
   {
     id: 'musian', on: 'IRN', label: 'Musian – Ein Khosh strip',

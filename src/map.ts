@@ -96,7 +96,7 @@ export class WarMap {
     g.append('circle').attr('cx', 3).attr('cy', 3).attr('r', 1).attr('fill', '#4b4842').attr('opacity', 0.55);
 
     // reeds for marshes
-    const m = d.append('pattern').attr('id', 'marsh').attr('patternUnits', 'userSpaceOnUse').attr('width', 14).attr('height', 9).attr('data-gap', 14).attr('data-angle', 0);
+    const m = d.append('pattern').attr('id', 'marsh').attr('patternUnits', 'userSpaceOnUse').attr('width', 14).attr('height', 9).attr('data-gap', 14).attr('data-angle', 0).attr('data-min', 0.6);
     m.append('rect').attr('width', 14).attr('height', 9).attr('fill', '#9fbfb0').attr('opacity', 0.55);
     m.append('path').attr('d', 'M2 7h5M4.5 7V3.5M3 7l-1-2.5M6 7l1-2.5').attr('stroke', '#3f6f62').attr('stroke-width', 0.8).attr('fill', 'none');
 
@@ -133,6 +133,52 @@ export class WarMap {
     return geoPath(this.projection);
   }
 
+  private tileLayer?: G;
+  private tilesShown = '';
+  private sparse = new Map<string, Set<string>>();
+
+  /** Relief tiles: pick the zoom that matches the screen, draw it over its parent so there are no holes while loading. */
+  private updateTiles() {
+    if (!this.tileLayer) return;
+    const z0 = Math.log2((2 * Math.PI * this.projection.scale()) / 256);
+    const zooms = Object.keys(this.relief.zooms).map(Number).sort((a, b) => a - b);
+    const want = Math.round(z0 + Math.log2(this.transform.k) + 0.25);
+    const zt = Math.max(zooms[0], Math.min(zooms[zooms.length - 1], want));
+    const [a, b] = [this.transform.invert([0, 0]), this.transform.invert([this.width, this.height])];
+    const nw = this.projection.invert!(a)!, se = this.projection.invert!(b)!;
+    const levels = zt > zooms[0] ? [zt - 1, zt] : [zt];
+    const key = `${levels}|${nw.map((v) => v.toFixed(2))}|${se.map((v) => v.toFixed(2))}`;
+    if (key === this.tilesShown) return;
+    this.tilesShown = key;
+    const tiles: { z: number; x: number; y: number }[] = [];
+    for (const z of levels) {
+      const info = this.relief.zooms[z];
+      const n = 2 ** z;
+      const fx = (lon: number) => Math.floor(((lon + 180) / 360) * n);
+      const fy = (lat: number) => Math.floor(((1 - Math.log(Math.tan((lat * Math.PI) / 180) + 1 / Math.cos((lat * Math.PI) / 180)) / Math.PI) / 2) * n);
+      let [x0, x1, y0, y1] = [fx(nw[0]), fx(se[0]), fy(Math.min(85, nw[1])), fy(Math.max(-85, se[1]))];
+      if (info.range) [x0, x1, y0, y1] = [Math.max(x0, info.range[0]), Math.min(x1, info.range[1]), Math.max(y0, info.range[2]), Math.min(y1, info.range[3])];
+      if (info.tiles && !this.sparse.has(String(z))) this.sparse.set(String(z), new Set(info.tiles));
+      const only = this.sparse.get(String(z));
+      if ((x1 - x0 + 1) * (y1 - y0 + 1) > 400) continue;
+      for (let x = x0; x <= x1; x++) for (let y = y0; y <= y1; y++) if (!only || only.has(`${x}/${y}`)) tiles.push({ z, x, y });
+    }
+    const lon = (x: number, z: number) => (x / 2 ** z) * 360 - 180;
+    const lat = (y: number, z: number) => (Math.atan(Math.sinh(Math.PI * (1 - (2 * y) / 2 ** z))) * 180) / Math.PI;
+    const proj = (p: [number, number]) => this.projection(p)!;
+    this.tileLayer.selectAll<SVGImageElement, (typeof tiles)[number]>('image').data(tiles, (t) => `${t.z}/${t.x}/${t.y}`)
+      .join((enter) => enter.append('image').attr('preserveAspectRatio', 'none').attr('href', (t) => `${import.meta.env.BASE_URL}relief/${t.z}/${t.x}/${t.y}.webp`))
+      .each(function (t) {
+        const p0 = proj([lon(t.x, t.z), lat(t.y, t.z)]), p1 = proj([lon(t.x + 1, t.z), lat(t.y + 1, t.z)]);
+        // overlap by a hair so seams don't show
+        this.setAttribute('x', String(p0[0]));
+        this.setAttribute('y', String(p0[1]));
+        this.setAttribute('width', String(p1[0] - p0[0] + 0.02));
+        this.setAttribute('height', String(p1[1] - p0[1] + 0.02));
+      })
+      .sort((p, q) => p.z - q.z);
+  }
+
   private drawBase() {
     const b = this.layers.base.html('');
     const path = this.path;
@@ -145,12 +191,13 @@ export class WarMap {
     const [rx0, ry0] = this.projection([rw, rn])!;
     const [rx1, ry1] = this.projection([re, rs])!;
 
-    const land = b.append('g');
     const clipId = 'land-clip';
-    b.select('defs').remove();
     const cp = b.append('defs').append('clipPath').attr('id', clipId);
     cp.selectAll('path').data(this.geo.countries.features).join('path').attr('d', path as never);
-    land.append('image').attr('href', `${import.meta.env.BASE_URL}relief.webp`).attr('x', rx0).attr('y', ry0).attr('width', rx1 - rx0).attr('height', ry1 - ry0).attr('preserveAspectRatio', 'none').attr('clip-path', `url(#${clipId})`);
+    const land = b.append('g').attr('clip-path', `url(#${clipId})`);
+    land.append('image').attr('href', `${import.meta.env.BASE_URL}${this.relief.overview}`).attr('x', rx0).attr('y', ry0).attr('width', rx1 - rx0).attr('height', ry1 - ry0).attr('preserveAspectRatio', 'none');
+    this.tileLayer = land.append('g').attr('class', 'tiles');
+    this.tilesShown = '';
 
     // wash the two belligerents faintly in their colours, fade the neighbours
     b.append('g').selectAll('path').data(this.geo.countries.features).join('path')
@@ -360,8 +407,11 @@ export class WarMap {
     // keep hatch spacing constant on screen
     this.svg.selectAll<SVGPatternElement, unknown>('pattern[data-gap]').each(function () {
       const angle = this.getAttribute('data-angle');
-      this.setAttribute('patternTransform', `scale(${1 / k}) rotate(${angle})`);
+      // marsh reeds may shrink only a little, or they turn into dots
+      const min = Number(this.getAttribute('data-min') ?? 0);
+      this.setAttribute('patternTransform', `scale(${Math.max(min / Math.max(1, k / 4), 1 / k)}) rotate(${angle})`);
     });
+    this.updateTiles();
     this.host.style.setProperty('--ks', String(Math.min(2.2, Math.pow(k, 0.3))));
     this.drawPlaces();
     this.drawLabels();
@@ -374,11 +424,15 @@ export class WarMap {
     const [x0, y0] = this.projection([w, n])!;
     const [x1, y1] = this.projection([e, s])!;
     const pad = Math.min(this.width, this.height) * 0.06;
-    const rightInset = this.host.dataset.panel === 'open' && this.width > 900 ? 400 : 0;
-    const bottomInset = this.width <= 900 && this.host.dataset.panel === 'open' ? this.height * 0.42 : 0;
-    const vw = this.width - rightInset - pad * 2, vh = this.height - bottomInset - pad * 2;
+    // keep the target clear of the floating legend (left) and the detail panel (right / bottom sheet)
+    const desktop = this.width > 900;
+    const legend = document.getElementById('legend');
+    const leftInset = desktop && legend && !legend.classList.contains('collapsed') ? legend.getBoundingClientRect().right - this.host.getBoundingClientRect().left : 0;
+    const rightInset = desktop && this.host.dataset.panel === 'open' ? 400 : 0;
+    const bottomInset = !desktop && this.host.dataset.panel === 'open' ? this.height * 0.42 : 0;
+    const vw = this.width - leftInset - rightInset - pad * 2, vh = this.height - bottomInset - pad * 2;
     const k = Math.min(40, vw / (x1 - x0), vh / (y1 - y0));
-    const tx = pad + vw / 2 - (k * (x0 + x1)) / 2;
+    const tx = leftInset + pad + vw / 2 - (k * (x0 + x1)) / 2;
     const ty = pad + vh / 2 - (k * (y0 + y1)) / 2;
     const target = zoomIdentity.translate(tx, ty).scale(k);
     return new Promise<void>((resolve) => {

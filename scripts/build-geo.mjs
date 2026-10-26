@@ -85,11 +85,38 @@ for (const e of osm) {
   const name = e.tags['name:en'] || RIVER_EN[e.tags.name] || e.tags.name;
   const parts = e.type === 'way' ? [line(e.geometry)] : e.members.filter((m) => m.type === 'way' && m.geometry && m.role !== 'tributary').map((m) => line(m.geometry));
   if (osmRivers.some((r) => r.properties.osm === e.id)) continue;
-  const f = { type: 'Feature', properties: { name, fa: e.tags['name:fa'] || RIVER_FA[name], osm: e.id }, geometry: { type: 'MultiLineString', coordinates: parts } };
+  const f = { type: 'Feature', properties: { name, fa: e.tags['name:fa'] || RIVER_FA[name], osm: e.id }, geometry: { type: 'MultiLineString', coordinates: chain(parts) } };
   const g = bboxClip(f, BBOX).geometry;
   // ~250 m precision is plenty at theatre scale and keeps the file small
   f.geometry = { type: 'MultiLineString', coordinates: (g.type === 'LineString' ? [g.coordinates] : g.coordinates).map((l) => thin(l, 0.0025)) };
   osmRivers.push(f);
+}
+
+// Join a relation's ways end-to-end so a river is one line where OSM has it in pieces
+// (zones in src/data/zones.ts trace front lines along rivers).
+function chain(parts) {
+  const eq = (a, b) => a[0] === b[0] && a[1] === b[1];
+  const segs = parts.map((p) => p.slice());
+  const out = [];
+  while (segs.length) {
+    let cur = segs.shift();
+    for (let grew = true; grew; ) {
+      grew = false;
+      for (let i = 0; i < segs.length; i++) {
+        const s = segs[i];
+        if (eq(cur.at(-1), s[0])) cur = cur.concat(s.slice(1));
+        else if (eq(cur.at(-1), s.at(-1))) cur = cur.concat(s.slice(0, -1).reverse());
+        else if (eq(cur[0], s.at(-1))) cur = s.concat(cur.slice(1));
+        else if (eq(cur[0], s[0])) cur = s.slice().reverse().concat(cur.slice(1));
+        else continue;
+        segs.splice(i, 1);
+        grew = true;
+        break;
+      }
+    }
+    out.push(cur);
+  }
+  return out;
 }
 
 function thin(l, tol) {

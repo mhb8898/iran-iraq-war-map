@@ -72,7 +72,7 @@ export class Timeline {
 
     // year ticks
     const years: number[] = [1937, 1975];
-    for (let yy = 1979; yy <= 1989; yy++) years.push(yy);
+    for (let yy = 1980; yy <= 1988; yy++) years.push(yy);
     years.push(1990, 2003);
     const tg = svg.append('g').attr('class', 'ticks');
     for (const yy of years) {
