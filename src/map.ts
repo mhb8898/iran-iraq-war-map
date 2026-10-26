@@ -102,7 +102,7 @@ export class WarMap {
     m.append('path').attr('d', 'M2 7h5M4.5 7V3.5M3 7l-1-2.5M6 7l1-2.5').attr('stroke', '#3f6f62').attr('stroke-width', 0.8).attr('fill', 'none');
 
     // engraved sea
-    const s = d.append('pattern').attr('id', 'sea').attr('patternUnits', 'userSpaceOnUse').attr('width', 40).attr('height', 6);
+    const s = d.append('pattern').attr('id', 'sea').attr('patternUnits', 'userSpaceOnUse').attr('width', 40).attr('height', 6).attr('data-gap', 40).attr('data-angle', 0);
     s.append('rect').attr('width', 40).attr('height', 6).attr('fill', '#c3d3d1');
     s.append('path').attr('d', 'M0 3q5 -2 10 0t10 0t10 0t10 0').attr('stroke', '#a9bfbd').attr('stroke-width', 0.7).attr('fill', 'none');
 
@@ -370,6 +370,7 @@ export class WarMap {
     const k = this.transform.k;
     const w = Math.max(5, Math.min(13, 4 + 2.4 * Math.log2(k + 1)));
     const smooth = line().curve(curveCatmullRom.alpha(0.5));
+    const labelBoxes: [number, number, number, number][] = [];
     for (const { arrow, t } of this.arrows) {
       if (t <= 0) continue;
       const pts = arrow.path.map((p) => this.screen(p));
@@ -424,8 +425,17 @@ export class WarMap {
       if (kind === 'air') g.append('text').attr('class', 'glyph').attr('transform', `translate(${tip.x},${tip.y}) rotate(${ang + 45})`).text('✈');
 
       if (arrow.label && t > 0.55) {
-        const mid = node.getPointAtLength(len * 0.5);
-        g.append('text').attr('class', 'arrow-label').attr('x', mid.x).attr('y', mid.y - bw - 4).attr('fill', color).text(arrow.label);
+        // try a few spots along and either side of the arrow until the label doesn't collide
+        const tw = arrow.label.length * 6.8 + 6;
+        for (const [along, side] of [[0.5, -1], [0.5, 1], [0.3, -1], [0.7, -1], [0.3, 1], [0.7, 1], [0.5, -2.2]] as const) {
+          const p = node.getPointAtLength(len * along * t);
+          const y = p.y + side * (bw + 8) + (side > 0 ? 6 : 0);
+          const box: [number, number, number, number] = [p.x - tw / 2, y - 11, p.x + tw / 2, y + 3];
+          if (labelBoxes.some((b) => box[0] < b[2] && box[2] > b[0] && box[1] < b[3] && box[3] > b[1])) continue;
+          labelBoxes.push(box);
+          g.append('text').attr('class', 'arrow-label').attr('x', p.x).attr('y', y).attr('fill', color).text(arrow.label);
+          break;
+        }
       }
       probe.remove();
     }
