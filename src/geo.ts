@@ -90,9 +90,21 @@ export function buildControl(geo: Base) {
 
   const area = (fs: ZoneFeature[], kind: ControlKind) => fs.filter((f) => f.properties.kind === kind).reduce((s, f) => s + geoArea(f) * EARTH_KM2, 0);
 
+  // Overlaps: a fought-over city (cutsHeld) punches through the occupied sector around it;
+  // otherwise held zones sit on top and are cut out of broad gray regions (e.g. Haj Omran inside the Kurdish highlands).
+  const carve = (fs: ZoneFeature[]) => {
+    const cutters = new Set(ZONES.filter((z) => z.cutsHeld).map((z) => z.id));
+    const coords = (f: ZoneFeature) => f.geometry.coordinates as PCMulti;
+    const gray = fs.filter((f) => f.properties.kind === 'contested' && cutters.has(f.properties.id)).map(coords);
+    const held = fs.filter((f) => f.properties.kind !== 'contested').map(coords);
+    const minus = (f: ZoneFeature, cut: PCMulti[]) =>
+      cut.length ? rewind({ ...f, geometry: { type: 'MultiPolygon', coordinates: polygonClipping.difference(coords(f), ...cut) as MultiPolygon['coordinates'] } } as ZoneFeature) : f;
+    return fs.map((f) => (f.properties.kind !== 'contested' ? minus(f, gray) : cutters.has(f.properties.id) ? f : minus(f, held)));
+  };
+
   const byPhase = new Map(
     PHASES.map((p) => {
-      const fs = featuresFor(p);
+      const fs = carve(featuresFor(p));
       return [p.id, { features: fs, iraqHeldKm2: area(fs, 'iraqHeld'), iranHeldKm2: area(fs, 'iranHeld'), contestedKm2: area(fs, 'contested') }];
     }),
   );

@@ -23,6 +23,11 @@ export const PHASES: Phase[] = [
     note: 'Central authority collapses in Iranian Kurdistan; the army is purged and weakened.',
   },
   {
+    id: 'invasion-early', date: '1980-10-10', label: 'Three weeks into the invasion',
+    iraqHeld: ['khuz-south', 'khuz-bostan', 'khuz-karkheh', 'musian', 'mehran', 'central-1980'], iranHeld: [], contested: ['kurdistan-irn', 'khorramshahr-city', 'dezful-approach'],
+    note: 'Iraq holds most of the ground it will take, but Khorramshahr is still fighting street by street and Iraqi tanks have stopped short of Dezful.',
+  },
+  {
     id: 'invasion-max', date: '1980-11-01', label: 'Iraqi advance at its height',
     iraqHeld: ['khuz-karun-bridgehead', 'khuz-south', 'khuz-bostan', 'khuz-karkheh', 'musian', 'mehran', 'central-1980'], iranHeld: [], contested: ['kurdistan-irn'],
     note: 'Khorramshahr has fallen, Abadan is besieged, and Iraqi guns reach Dezful and Ahvaz.',

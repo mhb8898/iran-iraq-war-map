@@ -28,6 +28,20 @@ npm install
 npm run dev
 ```
 
+## Checking the data
+
+```bash
+npm run check          # errors and warnings
+npm run check -- --all # plus notes
+```
+
+`scripts/check-events.ts` tests every event against the map it is shown on and against its
+Wikipedia summary: attack arrows start on their own side's ground and end on enemy or contested
+ground; a won attack's target is held afterwards and a lost one's is not; wartime fighting never
+falls back to a pre-war map; dates agree with the article; every zone survives clipping to the
+real border; cameras frame their arrows. Front lines are approximate, so it probes within ~10 km.
+Flags that have been reviewed and accepted are listed, with reasons, in `ACCEPTED` at the top.
+
 ## Data pipeline
 
 All generated data is committed under `public/`; rebuild only when changing it.

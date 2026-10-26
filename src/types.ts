@@ -17,6 +17,9 @@ export interface Zone {
   shape: (LonLat | RiverEdge)[];
   label: string;
   note?: string;
+  /** gray zone that punches through held zones (a city still being fought over inside an occupied sector);
+   *  otherwise held zones are drawn over broad gray ones */
+  cutsHeld?: boolean;
 }
 
 export interface Phase {

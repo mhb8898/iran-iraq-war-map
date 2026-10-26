@@ -65,7 +65,7 @@ export const EVENTS: WarEvent[] = [
       { side: 'iraq', path: [[45.3, 33.8], [45.45, 33.84], [45.64, 33.86]], label: 'Sumar' },
       { side: 'iraq', path: [[45.25, 34.45], [45.45, 34.5], [45.58, 34.51], [45.78, 34.45]], label: 'Qasr-e Shirin' },
     ],
-    places: ['khorramshahr', 'susangerd', 'dezful', 'mehran', 'qasreshirin'], focus: [44.2, 29.9, 51.6, 35.9], refs: ['woods-saddam', 'pollack', 'murray-woods', 'unsc-479'], phase: 'invasion-max',
+    places: ['khorramshahr', 'susangerd', 'dezful', 'mehran', 'qasreshirin'], focus: [44.2, 29.9, 51.6, 35.9], refs: ['woods-saddam', 'pollack', 'murray-woods', 'unsc-479'], phase: 'invasion-early',
   },
   {
     id: 'kaman99', date: '1980-09-23', name: 'Operation Kaman 99', fa: 'عملیات کمان ۹۹', kind: 'air', side: 'iran', outcome: 'iran',
@@ -112,14 +112,19 @@ export const EVENTS: WarEvent[] = [
 
   // ── 1981 ────────────────────────────────────────────────────────────────────────
   {
-    id: 'nasr', date: '1981-01-05', end: '1981-01-09', name: 'Operation Nasr (Hoveyzeh)', fa: 'عملیات نصر', kind: 'operation', side: 'iran', outcome: 'iraq',
-    summary: 'President Banisadr\'s regular army sends an armoured division west from Hamidiyeh without infantry support. Iraqi armour catches it near Hoveyzeh in one of the war\'s largest tank battles; Iran loses well over a hundred tanks.',
+    id: 'nasr', date: '1981-01-05', end: '1981-01-08', name: 'Operation Nasr: the great tank battle', fa: 'عملیات نصر (هویزه)', kind: 'operation', side: 'iran', outcome: 'iraq',
+    summary: 'President Banisadr takes personal command of the regular army for a war-winning blow: about 300 tanks of the 16th and 92nd Armoured Divisions cross the Karkheh on pontoon bridges, drive west on the Ahvaz–Susangerd road, then are to swing down the Karun to relieve Abadan, which breaks out to meet them. Iraqi spotter planes see the columns coming. Stuck to the road by mud, the brigades advance one after another into a three-sided box of dug-in T-62s and T-72s; tanks that leave the road sink. Iraqi jets bomb the pontoon bridge behind them. In four days Iran loses 214 tanks to Iraq\'s 45, the Abadan breakout fails, and Banisadr\'s career is finished. Wikipedia\'s main war article calls this the "Battle of Dezful".',
     wiki: 'Operation Nasr',
     arrows: [
-      { side: 'iran', path: [[48.45, 31.5], [48.28, 31.46], [48.12, 31.43]], label: 'Iranian armour' },
-      { side: 'iraq', kind: 'counter', path: [[47.92, 31.3], [48.05, 31.38], [48.18, 31.44]] },
+      { side: 'iran', path: [[48.5, 31.6], [48.44, 31.53], [48.33, 31.52], [48.21, 31.5]], label: 'Over the Karkheh, toward Susangerd' },
+      { side: 'iraq', kind: 'counter', path: [[48.04, 31.49], [48.16, 31.5]], label: 'Dug-in tanks' },
+      { side: 'iraq', kind: 'counter', path: [[48.08, 31.64], [48.2, 31.55]] },
+      { side: 'iraq', kind: 'counter', path: [[48.24, 31.38], [48.27, 31.47]] },
+      { side: 'iraq', kind: 'air', path: [[47.9, 31.75], [48.2, 31.7], [48.45, 31.52]], label: 'Bridge bombed' },
+      { side: 'iran', path: [[48.3, 30.38], [48.31, 30.47]], label: 'Abadan breakout' },
+      { side: 'iran', path: [[48.62, 31.24], [48.52, 31.2]], label: 'Diversion west of Ahvaz' },
     ],
-    places: ['hoveyzeh', 'hamidiyeh', 'susangerd'], refs: ['pollack', 'razoux'],
+    places: ['hoveyzeh', 'hamidiyeh', 'susangerd', 'ahvaz', 'abadan'], focus: [47.9, 30.3, 48.8, 31.8], refs: ['pollack', 'razoux'],
   },
   {
     id: 'banisadr', date: '1981-06-21', name: 'Banisadr impeached', kind: 'political', side: 'iran',
@@ -171,7 +176,7 @@ export const EVENTS: WarEvent[] = [
     arrows: [
       { side: 'iran', path: [[48.44, 30.8], [48.3, 30.82], [48.15, 30.85]], label: '1: Karun crossing' },
       { side: 'iran', path: [[48.55, 31.22], [48.35, 31.25], [48.1, 31.28], [47.9, 31.25]], label: '2: To the border' },
-      { side: 'iran', path: [[47.98, 31.15], [47.97, 30.85], [47.99, 30.56]] },
+      { side: 'iran', path: [[47.9, 31.25], [47.96, 30.9], [47.99, 30.56]] },
       { side: 'iran', path: [[48.15, 30.85], [48.12, 30.65], [48.17, 30.47]], label: '3: Khorramshahr' },
       { side: 'iraq', kind: 'retreat', path: [[48.15, 30.45], [47.98, 30.5], [47.84, 30.52]] },
     ],
@@ -240,7 +245,7 @@ export const EVENTS: WarEvent[] = [
     id: 'dawn3', date: '1983-07-30', end: '1983-08-09', name: 'Operation Dawn 3 (Mehran)', fa: 'عملیات والفجر ۳', kind: 'operation', side: 'iran', outcome: 'iran',
     summary: 'Iran takes the heights around Mehran, making the town untenable for Iraq. Iraq answers with mustard gas, one of its first large chemical uses.',
     wiki: 'Operation Dawn 3',
-    arrows: [{ side: 'iran', path: [[46.3, 33.22], [46.16, 33.12], [46.0, 33.02]] }],
+    arrows: [{ side: 'iran', path: [[46.3, 33.22], [46.2, 33.15], [46.11, 33.07]], label: 'Heights around Mehran' }],
     places: ['mehran', 'ilam'], focus: [45.7, 32.8, 46.6, 33.5], refs: ['razoux', 'cordesman'],
   },
   {
@@ -294,7 +299,7 @@ export const EVENTS: WarEvent[] = [
 
   // ── 1986 ────────────────────────────────────────────────────────────────────────
   {
-    id: 'dawn8', date: '1986-02-09', end: '1986-02-25', name: 'Operation Dawn 8 (al-Faw)', fa: 'عملیات والفجر ۸', kind: 'operation', side: 'iran', outcome: 'iran',
+    id: 'dawn8', date: '1986-02-09', end: '1986-03-10', name: 'Operation Dawn 8 (al-Faw)', fa: 'عملیات والفجر ۸', kind: 'operation', side: 'iran', outcome: 'iran',
     summary: 'Frogmen and assault boats cross the wide Shatt al-Arab at night in rain, surprising the Iraqi defenders. Iran takes Faw and holds it against weeks of counter-attacks, putting Kuwait and Basra\'s sea access under threat.',
     wiki: 'Operation Dawn 8',
     arrows: [
@@ -425,7 +430,7 @@ export const EVENTS: WarEvent[] = [
     arrows: [
       { side: 'iraq', path: [[47.4, 31.0], [47.53, 31.05], [47.66, 31.1]] },
       { side: 'iraq', kind: 'naval', path: [[47.42, 31.25], [47.58, 31.2]], label: 'Amphibious' },
-      { side: 'iraq', path: [[47.62, 30.88], [47.75, 30.98], [47.78, 31.1]], label: 'III Corps' },
+      { side: 'iraq', path: [[47.6, 30.88], [47.68, 30.97], [47.69, 31.07]], label: 'III Corps' },
     ],
     places: ['majnoon', 'qurna'], focus: [47.2, 30.85, 47.95, 31.4], refs: ['woods-saddam'],
   },
@@ -492,14 +497,15 @@ export const EVENTS: WarEvent[] = [
     places: ['khanaqin', 'naftshahr', 'fakkeh'], focus: [45.0, 31.8, 48.1, 34.6], refs: ['woods-saddam', 'razoux'],
   },
   {
-    id: 'dezful-1980', date: '1980-10-14', end: '1980-10-16', name: 'Battle of Dezful', kind: 'battle', side: 'iran', outcome: 'iraq',
-    summary: 'With Iraqi guns shelling Dezful, an Iranian armoured brigade and Revolutionary Guard infantry attack the Iraqi 10th Armoured Division. Its 42nd Armoured Brigade gives ground in good order onto a prepared killing area, and BMPs with Sagger missiles hit the Iranian tanks from the flank at 100–150 m. Iran abandons 84 tanks and dozens of other vehicles.',
+    id: 'dezful-1980', date: '1980-10-14', end: '1980-10-16', name: 'Iranian counter-attack at Dezful (Oct 1980)', fa: 'عملیات دزفول', kind: 'battle', side: 'iran', outcome: 'iraq',
+    summary: 'A week into the invasion the Iraqi 10th Armoured Division is a few kilometres from Dezful — the logistics hub of Khuzestan, ringed by the Shah\'s fortifications. It does not storm the city; it shells it and the Vahdati air base. On 14–16 October an Iranian armoured brigade (about 100 tanks) and Revolutionary Guard infantry hit its northern flank. The Iraqi 42nd Armoured Brigade falls back in good order onto ground it had ranged, and BMPs of the 24th Mechanised Brigade fire Sagger missiles into the Iranian tanks from 100–150 m. Iran abandons 136 vehicles, 84 of them tanks. (Not to be confused with Operation Nasr in January 1981, which Wikipedia\'s main war article also calls the "Battle of Dezful".)',
     wiki: 'Operation Dezful',
     arrows: [
-      { side: 'iran', path: [[48.36, 32.4], [48.22, 32.36], [48.08, 32.34]], label: 'Iranian 92nd Div.' },
-      { side: 'iraq', kind: 'retreat', path: [[48.1, 32.34], [47.98, 32.33]] },
-      { side: 'iraq', kind: 'counter', path: [[47.98, 32.47], [48.1, 32.39]], label: '24th Mech. Bde' },
-      { side: 'iraq', kind: 'counter', path: [[47.98, 32.22], [48.09, 32.3]] },
+      { side: 'iraq', kind: 'missile', path: [[48.12, 32.3], [48.28, 32.42], [48.4, 32.43]], label: 'Shelling Dezful air base' },
+      { side: 'iran', path: [[48.42, 32.47], [48.3, 32.44], [48.17, 32.4]], label: 'Iranian 92nd Armd brigade' },
+      { side: 'iraq', kind: 'retreat', path: [[48.17, 32.4], [48.06, 32.38]], label: '42nd Armd Bde falls back' },
+      { side: 'iraq', kind: 'counter', path: [[47.98, 32.5], [48.12, 32.45]], label: 'Saggers, 24th Mech' },
+      { side: 'iraq', kind: 'counter', path: [[47.98, 32.26], [48.12, 32.36]] },
     ],
     places: ['dezful', 'andimeshk', 'shush'], focus: [47.75, 32.05, 48.6, 32.6], refs: ['woods-saddam', 'pollack'],
   },

@@ -4,7 +4,8 @@ import { area, curveStepAfter } from 'd3-shape';
 import type { Phase, WarEvent } from './types';
 import { COLORS } from './map';
 
-export const parseDate = (s: string) => new Date(`${s}T00:00:00Z`);
+import { parseDate } from './phase-logic';
+export { parseDate };
 
 interface Opts {
   events: WarEvent[];

@@ -4,7 +4,8 @@ import { easeCubicOut } from 'd3-ease';
 import { buildControl, loadData } from './geo';
 import { WarMap, type ArrowState } from './map';
 import { Overview } from './overview';
-import { Timeline, parseDate } from './timeline';
+import { Timeline } from './timeline';
+import { parseDate, phaseAt, phaseBefore, phaseAfter } from './phase-logic';
 import { renderEvent, renderPhase } from './panel';
 import { EVENTS } from './data/events';
 import { PHASES } from './data/phases';
@@ -12,7 +13,6 @@ import { placeById } from './data/places';
 import type { Phase, WarEvent } from './types';
 
 const THEATRE: [number, number, number, number] = [44.2, 29.6, 50.2, 37.3];
-const DAY = 864e5;
 
 const events = [...EVENTS].sort((a, b) => a.date.localeCompare(b.date));
 
@@ -22,13 +22,6 @@ type SideFilter = 'all' | 'iran' | 'iraq';
 const involves = (e: WarEvent, f: SideFilter) =>
   f === 'all' || e.side === f || e.outcome === f || e.side === 'both' ||
   (e.kind === 'political' && !e.side) || (f === 'iraq' && e.side === 'other' && e.kind === 'operation');
-const phaseAt = (d: Date): Phase => [...PHASES].reverse().find((p) => parseDate(p.date) <= d) ?? PHASES[0];
-const phaseBefore = (e: WarEvent) => [...PHASES].reverse().find((p) => p.date < e.date) ?? PHASES[0];
-// Ground fighting shows the front once it's over; long air/naval campaigns and political events show it as they began.
-const phaseAfter = (e: WarEvent) =>
-  (e.phase && PHASES.find((p) => p.id === e.phase)) ||
-  (e.kind === 'operation' || e.kind === 'battle' ? phaseAt(new Date(parseDate(e.end ?? e.date).getTime() + 7 * DAY)) : phaseAt(parseDate(e.date)));
-
 function focusOf(e: WarEvent): [number, number, number, number] {
   if (e.focus) return e.focus;
   const pts = [...(e.arrows ?? []).flatMap((a) => a.path), ...(e.places ?? []).map((id) => placeById[id].at)];

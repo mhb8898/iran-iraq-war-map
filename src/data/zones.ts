@@ -95,6 +95,16 @@ export const ZONES: Zone[] = [
 
   // ── Contested / not fully controlled (gray) ──────────────────────────────────────
   {
+    id: 'khorramshahr-city', on: 'IRN', label: 'Khorramshahr (street fighting)', cutsHeld: true,
+    note: 'Regulars, Revolutionary Guards and local volunteers held the city block by block for 34 days.',
+    shape: [[48.12, 30.41], [48.24, 30.42], [48.26, 30.48], [48.2, 30.52], [48.13, 30.49]],
+  },
+  {
+    id: 'dezful-approach', on: 'IRN', label: 'Between the Karkheh and the Dez', cutsHeld: true,
+    note: 'Iraqi armour stopped a few kilometres from Dezful and shelled the city and its air base rather than storm it.',
+    shape: [[48.16, 32.46], [48.32, 32.44], [48.38, 32.33], [48.32, 32.16], [48.2, 32.13], [48.17, 32.3]],
+  },
+  {
     id: 'kurdistan-irn', on: 'IRN', label: 'Iranian Kurdistan (KDPI insurgency)',
     note: 'Kurdish parties held much of the countryside 1979–83; Tehran retook the towns first.',
     shape: [[44.8, 35.7], [46.5, 35.7], [46.6, 36.4], [46.3, 37.0], [45.3, 37.25], [44.8, 36.8]],
