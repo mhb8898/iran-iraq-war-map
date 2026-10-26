@@ -44,6 +44,8 @@ export class WarMap {
   private compareX: number | null = null;
   private riverAnchors: { text: string; a: LonLat; b: LonLat }[] = [];
   onZoneClick?: (z: ZoneFeature, x: number, y: number) => void;
+  /** visible area as [west, south, east, north], after every zoom/pan */
+  onView?: (bounds: [number, number, number, number]) => void;
 
   constructor(
     private host: HTMLElement,
@@ -280,17 +282,27 @@ export class WarMap {
     this.controlFeatures = features;
     if (!this.projection) return;
     const path = this.path;
+    // Fades are CSS animations on top of a final state that is always fully visible:
+    // d3 opacity transitions got interrupted by the next phase change and left zones at opacity 0.
     const sel = this.layers.control
       .selectAll<SVGPathElement, ZoneFeature>('path.zone')
       .data(features, (f) => `${f.properties.id}:${f.properties.kind}`);
-    sel.exit().transition().duration(animate ? 700 : 0).attr('opacity', 0).remove();
-    const entered = sel.enter().append('path').attr('opacity', animate ? 0 : 1);
+    sel.exit().each(function () {
+      if (!animate) return;
+      const ghost = this.cloneNode() as SVGPathElement;
+      // its own class, so the next data join (selectAll('path.zone')) never picks it up
+      ghost.setAttribute('class', `zone-ghost ${ghost.getAttribute('class')!.replace(/\bzone\b/, '').replace('flash', '').replace('enter', '')}`);
+      this.parentNode!.appendChild(ghost);
+      setTimeout(() => ghost.remove(), 800);
+    }).remove();
+    const entered = sel.enter().append('path');
     entered.merge(sel)
       .attr('class', (f) => `zone ${f.properties.kind}${changed.has(f.properties.id) ? ' flash' : ''}`)
       .attr('d', path as never)
       .attr('fill', (f) => `url(#${HATCH[f.properties.kind]})`)
-      .on('click', (ev: MouseEvent, f) => this.onZoneClick?.(f, ev.clientX, ev.clientY))
-      .transition().duration(animate ? 700 : 0).attr('opacity', 1);
+      .attr('opacity', null)
+      .on('click', (ev: MouseEvent, f) => this.onZoneClick?.(f, ev.clientX, ev.clientY));
+    if (animate) entered.classed('enter', true);
     this.drawLabels();
   }
 
@@ -461,6 +473,10 @@ export class WarMap {
       this.setAttribute('patternTransform', `scale(${grow / k}) rotate(${angle})`);
     });
     this.updateTiles();
+    if (this.onView) {
+      const nw = this.projection.invert!(this.transform.invert([0, 0]))!, se = this.projection.invert!(this.transform.invert([this.width, this.height]))!;
+      this.onView([nw[0], se[1], se[0], nw[1]]);
+    }
     this.host.style.setProperty('--ks', String(Math.min(2.2, Math.pow(k, 0.3))));
     this.drawPlaces();
     this.drawLabels();
@@ -475,8 +491,8 @@ export class WarMap {
     const pad = Math.min(this.width, this.height) * 0.06;
     // keep the target clear of the floating legend (left) and the detail panel (right / bottom sheet)
     const desktop = this.width > 900;
-    const legend = document.getElementById('legend');
-    const leftInset = desktop && legend && !legend.classList.contains('collapsed') ? legend.getBoundingClientRect().right - this.host.getBoundingClientRect().left : 0;
+    const column = document.querySelector('.left-col');
+    const leftInset = desktop && column ? column.getBoundingClientRect().right - this.host.getBoundingClientRect().left : 0;
     const rightInset = desktop && this.host.dataset.panel === 'open' ? 400 : 0;
     const bottomInset = !desktop && this.host.dataset.panel === 'open' ? this.height * 0.42 : 0;
     const vw = this.width - leftInset - rightInset - pad * 2, vh = this.height - bottomInset - pad * 2;
@@ -492,6 +508,13 @@ export class WarMap {
       }
       this.svg.transition().duration(duration).ease(easeCubicInOut).call(this.zoomer.transform, target).on('end', () => resolve()).on('interrupt', () => resolve());
     });
+  }
+
+  /** Centre the map on a point, keeping the zoom. */
+  panTo(p: LonLat) {
+    const [x, y] = this.projection(p)!;
+    const k = this.transform.k;
+    this.svg.transition().duration(700).ease(easeCubicInOut).call(this.zoomer.transform, zoomIdentity.translate(this.width / 2 - k * x, this.height / 2 - k * y).scale(k));
   }
 
   // ── compare swipe & furniture ──────────────────────────────────────────────────

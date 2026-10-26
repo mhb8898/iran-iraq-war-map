@@ -3,6 +3,7 @@ import { timer } from 'd3-timer';
 import { easeCubicOut } from 'd3-ease';
 import { buildControl, loadData } from './geo';
 import { WarMap, type ArrowState } from './map';
+import { Overview } from './overview';
 import { Timeline, parseDate } from './timeline';
 import { renderEvent, renderPhase } from './panel';
 import { EVENTS } from './data/events';
@@ -46,6 +47,8 @@ async function main() {
   const card = document.getElementById('card')!;
   const map = new WarMap(mapEl, geo, relief);
   if (import.meta.env.DEV) Object.assign(window, { __map: map });
+  const overview = new Overview(document.getElementById('overview')!, geo, (p) => map.panTo(p));
+  map.onView = (b) => overview.setView(b);
   let current: Phase | undefined;
   let selected = -1;
   let anim: ReturnType<typeof timer> | undefined;
@@ -58,6 +61,7 @@ async function main() {
     current = p;
     const changed = new Set(prev ? [...p.iraqHeld, ...p.iranHeld, ...p.contested].filter((z) => ![...prev.iraqHeld, ...prev.iranHeld, ...prev.contested].includes(z)) : []);
     map.drawControl(control.get(p.id)!.features, animate, changed);
+    overview.setPhase(p, control.get(p.id)!.features, control.get(p.id)!);
     map.setHistoricBorder(p.border);
     document.getElementById('phase-label')!.textContent = `${p.label} · ${parseDate(p.date).getUTCFullYear()}`;
   };
@@ -181,7 +185,8 @@ async function main() {
   document.getElementById('close-panel')!.onclick = () => openPanel(false);
   const compare = document.getElementById('compare') as HTMLInputElement;
   compare.onchange = () => map.setCompare(compare.checked);
-  if (window.innerWidth <= 900) document.getElementById('legend')!.classList.add('collapsed');
+  // the legend and the overview share the left column; on short screens the legend starts folded
+  if (window.innerWidth <= 900 || window.innerHeight < 960) document.getElementById('legend')!.classList.add('collapsed');
   document.getElementById('legend-toggle')!.onclick = () => document.getElementById('legend')!.classList.toggle('collapsed');
   window.addEventListener('keydown', (ev) => {
     if ((ev.target as HTMLElement).tagName === 'INPUT') return;

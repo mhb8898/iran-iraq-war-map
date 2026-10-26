@@ -51,7 +51,15 @@ a { color: #8a3b12; }
 .zone.iranHeld { stroke: var(--iran); }
 .zone.contested { stroke: #55524c; stroke-dasharray: 4 3; stroke-width: 1.4px; }
 .zone:hover { filter: brightness(1.08) saturate(1.2); }
+.zone.enter { animation: zone-in 0.7s ease-out; }
+.zone-ghost { animation: zone-out 0.7s ease-in forwards; pointer-events: none; stroke-width: 2.2px; vector-effect: non-scaling-stroke; }
+.zone-ghost.iraqHeld { stroke: var(--iraq); }
+.zone-ghost.iranHeld { stroke: var(--iran); }
+.zone-ghost.contested { stroke: #55524c; stroke-dasharray: 4 3; }
+@keyframes zone-in { from { opacity: 0; } }
+@keyframes zone-out { to { opacity: 0; } }
 .zone.flash { animation: flash 1.6s ease-out 2; }
+.zone.enter.flash { animation: zone-in 0.7s ease-out, flash 1.6s ease-out 2; }
 @keyframes flash { 0% { stroke-width: 7px; stroke-opacity: 1; } 100% { stroke-width: 2.2px; } }
 
 /* overlay text */
@@ -110,8 +118,9 @@ a { color: #8a3b12; }
 .phase-pill { margin-top: 10px; display: inline-flex; align-items: center; gap: 8px; font: 600 12px var(--sans); background: var(--ink); color: var(--paper-2); padding: 4px 10px 4px 8px; border-radius: 99px; }
 .phase-pill .dot { width: 8px; height: 8px; border-radius: 50%; background: #ffd54a; box-shadow: 0 0 0 3px rgba(255, 213, 74, 0.25); }
 
+.left-col { position: absolute; left: 16px; top: 172px; width: 268px; display: flex; flex-direction: column; gap: 10px; max-height: calc(100% - 172px - var(--dock-h) - 16px); }
 #legend {
-  position: absolute; left: 16px; top: 172px; width: 268px; padding: 10px 14px 12px; font-size: 12.5px;
+  padding: 10px 14px 12px; font-size: 12.5px;
   background: color-mix(in srgb, var(--paper-2) 92%, transparent); border: 1px solid var(--rule); border-radius: 4px;
   box-shadow: 0 8px 24px rgba(40, 30, 15, 0.15);
 }
@@ -143,6 +152,32 @@ a { color: #8a3b12; }
 .map-controls { position: absolute; right: 16px; bottom: calc(var(--dock-h) + 16px); display: flex; flex-direction: column; gap: 6px; transition: right 0.35s; }
 #map[data-panel='open'] ~ .map-controls { right: 412px; }
 .map-controls button { width: 38px; height: 38px; border-radius: 4px; border: 1px solid var(--rule); background: var(--paper-2); font-size: 18px; box-shadow: 0 4px 12px rgba(40, 30, 15, 0.15); }
+
+/* overview locator */
+#overview {
+  padding: 8px 8px 6px;
+  background: color-mix(in srgb, var(--paper-2) 94%, transparent); border: 1px solid var(--rule); border-radius: 4px;
+  box-shadow: 0 8px 24px rgba(40, 30, 15, 0.18); transition: right 0.35s;
+}
+.ov-head { display: flex; justify-content: space-between; align-items: baseline; font: 700 10.5px var(--sans); letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-2); margin-bottom: 4px; }
+.ov-head b { color: var(--ink); letter-spacing: 0.04em; }
+.ov-svg { display: block; width: 100%; height: auto; cursor: pointer; border: 1px solid var(--rule); }
+.ov-sea { fill: #c3d3d1; }
+.ov-land { fill: #ece3cc; stroke: #8b7c66; stroke-width: 0.5; }
+.ov-land.ov-IRN { fill: #e4e3cb; }
+.ov-land.ov-IRQ { fill: #eedfcd; }
+.ov-zone { stroke-width: 0.8; }
+.ov-zone.iraqHeld { fill: var(--iraq); fill-opacity: 0.75; stroke: var(--iraq); }
+.ov-zone.iranHeld { fill: var(--iran); fill-opacity: 0.75; stroke: var(--iran); }
+.ov-zone.contested { fill: #6f6c66; fill-opacity: 0.4; stroke: #55524c; stroke-dasharray: 1.5 1; }
+.ov-border { fill: none; stroke: #1d1a17; stroke-width: 1; stroke-dasharray: 3 1.5; }
+.ov-city { fill: var(--ink); }
+.ov-city-label { font: 600 7px var(--sans); fill: var(--ink-2); paint-order: stroke; stroke: #f7f1e3; stroke-width: 2px; }
+.ov-view { fill: rgba(255, 213, 74, 0.18); stroke: #1d1a17; stroke-width: 1.4; pointer-events: none; }
+.ov-ledger { display: grid; gap: 2px; margin-top: 5px; font-size: 11px; }
+.ov-ledger div { display: flex; align-items: center; gap: 6px; }
+.ov-ledger b { margin-left: auto; font-variant-numeric: tabular-nums; }
+.ov-ledger .sw { width: 14px; height: 10px; }
 
 /* panel */
 #panel {
@@ -244,10 +279,16 @@ a { color: #8a3b12; }
   .masthead h1 { font-size: 20px; }
   .fa-h1 { display: none; }
   .phase-pill { margin-top: 6px; }
-  #legend { top: auto; bottom: calc(var(--dock-h) + 10px); left: 10px; width: 236px; }
+  #legend { position: absolute; bottom: calc(var(--dock-h) + 10px); left: 10px; width: 236px; }
   #legend:not(.expanded) { }
   #panel { top: auto; left: 10px; right: 10px; width: auto; height: 42vh; bottom: calc(var(--dock-h) + 10px); transform: translateY(calc(100% + var(--dock-h) + 20px)); }
   #map[data-panel='open'] ~ .map-controls { right: 16px; bottom: calc(var(--dock-h) + 42vh + 20px); }
+  /* phone: a compact locator under the masthead, without the ledger */
+  .left-col { display: contents; }
+  #overview { position: absolute; top: 96px; right: 10px; width: 116px; padding: 5px; }
+  .ov-ledger, .ov-city-label { display: none; }
+  .ov-head { font-size: 9px; }
+
   .transport { padding: 0 6px 0 8px; }
   .transport button { min-width: 0; padding: 5px 8px; }
 }
