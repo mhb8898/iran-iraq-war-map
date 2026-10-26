@@ -1,0 +1,25 @@
+name: Historical correction
+description: A date, front line, unit, place or claim on the map looks wrong
+labels: [correction]
+body:
+  - type: input
+    id: where
+    attributes:
+      label: Which event or place?
+      description: Paste the link from your address bar if you can, e.g. https://mhb8898.github.io/iran-iraq-war-map/#karbala5
+    validations:
+      required: true
+  - type: textarea
+    id: wrong
+    attributes:
+      label: What is wrong?
+      description: What the map shows, and what you think it should show.
+    validations:
+      required: true
+  - type: textarea
+    id: source
+    attributes:
+      label: Source
+      description: A book, article or page that backs this up (author, title, page, or a link). Corrections with a source are much easier to apply.
+    validations:
+      required: false

@@ -1,0 +1,17 @@
+name: Idea or missing event
+description: Suggest an operation, unit, site or feature to add
+labels: [idea]
+body:
+  - type: textarea
+    id: idea
+    attributes:
+      label: What would you like to see?
+    validations:
+      required: true
+  - type: textarea
+    id: source
+    attributes:
+      label: Sources (for new events)
+      description: Where the dates, places and units come from.
+    validations:
+      required: false

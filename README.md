@@ -4,6 +4,9 @@ An interactive, hand-styled SVG map of the Iran–Iraq War (1980–1988), from t
 treaty to the 1990 return to the Algiers line. Pick any operation on the timeline and the map
 flies to it, draws the axes of attack, and redraws the lines of control as they stood afterwards.
 
+**[Open the map →](https://mhb8898.github.io/iran-iraq-war-map/)** · If you find it useful, please ⭐ star the repo and share it.
+Spotted a mistake? [Open an issue](https://github.com/mhb8898/iran-iraq-war-map/issues/new/choose) — or fix it yourself with a pull request ([how to contribute](CONTRIBUTING.md)).
+
 - **Lines of control vs. today's border.** The international border (fixed by the 1975 Algiers
   Agreement and still in force) is always drawn. Iraqi-held Iranian soil is hatched red,
   Iranian-held Iraqi soil hatched green, and areas that neither side fully controlled
@@ -61,6 +64,10 @@ OpenStreetMap Overpass extracts (`osm_rivers.json`, `osm_extra.json`) that `buil
 The historical content lives in `src/data/`: `events.ts` (operations and arrows), `zones.ts`
 (drawn areas of control), `phases.ts` (which zones are held/contested at each date),
 `places.ts`, `refs.ts`.
+
+## Contributing
+
+Corrections with a source, new events and fixes are welcome — see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Sources & credits
 

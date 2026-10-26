@@ -150,7 +150,15 @@ a { color: #8a3b12; }
 .phase-pill { margin-top: 10px; display: inline-flex; align-items: center; gap: 8px; font: 600 12px var(--sans); background: var(--ink); color: var(--paper-2); padding: 4px 10px 4px 8px; border-radius: 99px; }
 .phase-pill .dot { width: 8px; height: 8px; border-radius: 50%; background: #ffd54a; box-shadow: 0 0 0 3px rgba(255, 213, 74, 0.25); }
 
-.left-col { position: absolute; left: 16px; top: 172px; width: 268px; display: flex; flex-direction: column; gap: 10px; max-height: calc(100% - 172px - var(--dock-h) - 16px); }
+/* star / share / feedback / contribute */
+.support { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; pointer-events: auto; }
+.sbtn { font: 600 11.5px var(--sans); color: var(--ink); text-decoration: none; padding: 3px 9px; border: 1px solid var(--rule); border-radius: 3px; background: var(--paper-2); line-height: 1.4; }
+.sbtn:hover { background: var(--ink); border-color: var(--ink); color: var(--paper-2); }
+.sbtn.star { border-color: #b8952e; background: #fbefc4; }
+.sbtn.star:hover { background: #b8952e; color: #fff; }
+#star-count:not(:empty) { margin-left: 2px; padding-left: 6px; border-left: 1px solid currentColor; font-variant-numeric: tabular-nums; }
+
+.left-col { position: absolute; left: 16px; top: 192px; width: 268px; display: flex; flex-direction: column; gap: 10px; max-height: calc(100% - 192px - var(--dock-h) - 16px); }
 #legend {
   padding: 10px 14px 12px; font-size: 12.5px;
   background: color-mix(in srgb, var(--paper-2) 92%, transparent); border: 1px solid var(--rule); border-radius: 4px;
@@ -336,6 +344,10 @@ a { color: #8a3b12; }
   .left-col { display: contents; }
   #legend, #overview { display: none; position: absolute; top: 52px; left: 8px; right: 56px; z-index: 5; max-height: calc(100% - 52px - var(--dock-h) - 80px); overflow: auto; }
   body.show-legend #legend, body.show-overview #overview { display: block; }
+  .support { display: none; position: absolute; top: 52px; right: 56px; z-index: 5; flex-direction: column; margin: 0; padding: 10px; width: 168px;
+    background: var(--paper-2); border: 1px solid var(--rule); border-radius: 4px; box-shadow: 0 8px 24px rgba(40, 30, 15, 0.18); }
+  body.show-support .support { display: flex; }
+  .sbtn { font-size: 13px; padding: 7px 10px; text-align: left; }
   #legend-toggle { display: none; }
   #legend.collapsed ul, #legend.collapsed .caveat, #legend.collapsed .compare { display: revert; }
   #legend ul { margin-top: 0; }

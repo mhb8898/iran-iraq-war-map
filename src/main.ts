@@ -10,6 +10,7 @@ import { renderEvent, renderPhase } from './panel';
 import { EVENTS } from './data/events';
 import { PHASES } from './data/phases';
 import { placeById } from './data/places';
+import { setupSupport } from './support';
 import type { Phase, WarEvent } from './types';
 
 const THEATRE: [number, number, number, number] = [44.2, 29.6, 50.2, 37.3];
@@ -72,19 +73,21 @@ async function main() {
   document.getElementById('panel-peek')!.onclick = () => {
     panel.dataset.open = panel.dataset.open === 'true' ? 'peek' : 'true';
   };
-  const toggleSheet = (cls: 'show-overview' | 'show-legend', other: 'show-overview' | 'show-legend') => {
-    const on = !document.body.classList.contains(cls);
-    document.body.classList.toggle(cls, on);
-    document.body.classList.remove(other);
-    document.getElementById('toggle-overview')!.setAttribute('aria-pressed', String(document.body.classList.contains('show-overview')));
-    document.getElementById('toggle-legend')!.setAttribute('aria-pressed', String(document.body.classList.contains('show-legend')));
+  // phones: overview, legend and the support links each sit behind a map button, one open at a time
+  const sheets = { overview: 'show-overview', legend: 'show-legend', support: 'show-support' } as const;
+  const toggleSheet = (name: keyof typeof sheets) => {
+    const on = !document.body.classList.contains(sheets[name]);
+    for (const [k, cls] of Object.entries(sheets)) {
+      document.body.classList.toggle(cls, on && k === name);
+      document.getElementById(`toggle-${k}`)!.setAttribute('aria-pressed', String(on && k === name));
+    }
   };
-  document.getElementById('toggle-overview')!.onclick = () => toggleSheet('show-overview', 'show-legend');
-  document.getElementById('toggle-legend')!.onclick = () => toggleSheet('show-legend', 'show-overview');
+  for (const k of Object.keys(sheets) as (keyof typeof sheets)[]) document.getElementById(`toggle-${k}`)!.onclick = () => toggleSheet(k);
+  setupSupport();
   // tapping the map puts the legend / overview away again
   mapEl.addEventListener('pointerdown', () => {
     if (!isPhone()) return;
-    document.body.classList.remove('show-legend', 'show-overview');
+    document.body.classList.remove(...Object.values(sheets));
     document.querySelectorAll('.map-controls [aria-pressed]').forEach((b) => b.setAttribute('aria-pressed', 'false'));
   });
 
