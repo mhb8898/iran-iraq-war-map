@@ -1,8 +1,10 @@
-import type { Phase, WarEvent, WikiEntry } from './types';
+import type { Force, Phase, WarEvent, WikiEntry } from './types';
 import type { Wiki } from './geo';
 import { refById } from './data/refs';
 import { zoneById } from './data/zones';
 import { sideColor } from './timeline';
+import { siteById } from './data/sites';
+import { COLORS, SITE_GLYPH, SITE_KIND_NAME } from './map';
 
 const esc = (s: string) => s.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
 const fmt = (s: string) => new Date(`${s}T00:00:00Z`).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
@@ -17,6 +19,33 @@ export interface PanelCtx {
   statsAfter: { iraqHeldKm2: number; iranHeldKm2: number; contestedKm2: number };
   index: number;
   total: number;
+}
+
+const SIDE_NAME = { iran: 'Iran', iraq: 'Iraq', other: 'Others' } as const;
+
+/** Order of battle: the units on the arrows (with the axis they took) plus the event's other forces, by side. */
+function forcesHtml(ev: WarEvent) {
+  const all: Force[] = [
+    ...(ev.arrows ?? []).filter((a) => a.unit).map((a) => ({ side: a.side, unit: a.unit!, note: a.label && `axis: ${a.label}` })),
+    ...(ev.forces ?? []),
+  ];
+  const seen = new Set<string>();
+  const rows = all.filter((f) => !seen.has(`${f.side}:${f.unit}`) && seen.add(`${f.side}:${f.unit}`));
+  if (!rows.length) return '';
+  const first = ev.side === 'iraq' || ev.side === 'other' ? ['iraq', 'other', 'iran'] : ['iran', 'iraq', 'other'];
+  const groups = first.map((side) => [side, rows.filter((f) => f.side === side)] as const).filter(([, fs]) => fs.length);
+  return `<section class="forces">
+    <h3>Forces involved</h3>
+    ${groups.map(([side, fs]) => `<div class="side" style="--c:${COLORS[side as keyof typeof COLORS]}"><h4>${SIDE_NAME[side as keyof typeof SIDE_NAME]}</h4><ul>${fs.map((f) => `<li><b>${esc(f.unit)}</b>${f.note ? ` <span>— ${esc(f.note)}</span>` : ''}</li>`).join('')}</ul></div>`).join('')}
+    <p class="muted small">Formations as named in the cited histories and Wikipedia's orders of battle; tags on the map mark the axis each one took.</p>
+  </section>`;
+}
+
+function sitesHtml(ev: WarEvent) {
+  const sites = (ev.sites ?? []).map((id) => siteById[id]).filter(Boolean);
+  if (!sites.length) return '';
+  return `<section class="key-sites"><h3>Strategic sites</h3><ul class="sites-list">${sites.map((s) =>
+    `<li><svg width="22" height="18" viewBox="-11 -9 22 18" class="lg-site"><g class="site k-${s.kind} side-${s.side}"><g class="glyph">${SITE_GLYPH[s.kind].replace(/V15/, 'V9')}</g></g></svg><span><b>${esc(s.name)}</b> <span class="muted">· ${SITE_KIND_NAME[s.kind]}</span><br>${esc(s.note)}</span></li>`).join('')}</ul></section>`;
 }
 
 export function photoFor(ev: WarEvent, wiki: Wiki): { entry: WikiEntry; via?: string } | undefined {
@@ -52,6 +81,8 @@ export function renderEvent(el: HTMLElement, ev: WarEvent, wiki: Wiki, ctx: Pane
       <div class="dates">${dates}</div>
       <p class="summary">${esc(ev.summary)}</p>
       ${ev.arrows?.length ? `<button class="replay" type="button">↻ Replay the movement</button>` : ''}
+      ${forcesHtml(ev)}
+      ${sitesHtml(ev)}
 
       <section class="lines">
         <h3>Lines of control ${changed ? `<span class="arrow">${esc(ctx.phaseBefore.label)} → ${esc(ctx.phaseAfter.label)}</span>` : `· ${esc(ctx.phaseAfter.label)}`}</h3>

@@ -45,6 +45,41 @@ export interface Arrow {
   route?: boolean;
   /** the target lies beyond the map edge where this arrow ends; shown as a tag at the tip */
   offMap?: string;
+  /** the formation on this axis, as named by the sources (e.g. "92nd Armd Div", "III Corps") */
+  unit?: string;
+}
+
+/** A formation that took part in an event but has no arrow of its own (reserves, air arms, HQs). */
+export interface Force {
+  side: Side | 'other';
+  unit: string;
+  note?: string;
+}
+
+/** An area drawn with an event's arrows: an ambush or kill zone, a dug-in line, a flooded barrier. */
+export interface BattleArea {
+  kind: 'trap' | 'defence' | 'water';
+  side: Side | 'other';
+  shape: LonLat[];
+  label: string;
+}
+
+export type SiteKind = 'airbase' | 'oil' | 'port' | 'nuclear' | 'dam' | 'pass' | 'garrison' | 'command';
+
+/** A strategic point that stays on the map: air bases, oil, ports, dams, passes, where formations were based. */
+export interface Site {
+  id: string;
+  name: string;
+  fa?: string;
+  at: LonLat;
+  kind: SiteKind;
+  side: Side;
+  note: string;
+  /** shown only between these dates (ISO); e.g. a corps that was formed mid-war */
+  from?: string;
+  to?: string;
+  /** 1 = always shown once zoomed in a little, 2 = only closer in */
+  rank: 1 | 2;
 }
 
 export type EventKind = 'operation' | 'battle' | 'air' | 'naval' | 'political' | 'atrocity';
@@ -65,6 +100,9 @@ export interface WarEvent {
   wiki?: string; // English Wikipedia title
   arrows?: Arrow[];
   places?: string[]; // place ids to highlight
+  sites?: string[]; // strategic site ids to highlight
+  forces?: Force[];
+  areas?: BattleArea[];
   focus?: [number, number, number, number]; // w,s,e,n; defaults to arrows+places bbox
   refs?: string[];
   /** phase to show once the event is over, when it isn't the nearest snapshot */

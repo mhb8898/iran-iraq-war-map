@@ -11,6 +11,7 @@ import { EVENTS } from '../src/data/events';
 import { PHASES } from '../src/data/phases';
 import { ZONES } from '../src/data/zones';
 import { placeById } from '../src/data/places';
+import { SITES, siteById } from '../src/data/sites';
 import { refById } from '../src/data/refs';
 import { phaseAfter, phaseBefore, parseDate } from '../src/phase-logic';
 import type { Arrow, LonLat, Phase, WarEvent } from '../src/types';
@@ -85,6 +86,14 @@ for (const e of EVENTS) {
   // references and places
   for (const r of e.refs ?? []) if (!refById[r]) flag('error', e, `unknown reference "${r}"`);
   for (const id of e.places ?? []) if (!placeById[id]) flag('error', e, `unknown place "${id}"`);
+  for (const id of e.sites ?? []) {
+    const s = siteById[id];
+    if (!s) flag('error', e, `unknown site "${id}"`);
+    else if ((s.from && (e.end ?? e.date) < s.from) || (s.to && e.date > s.to)) flag('warn', e, `site "${id}" is highlighted but only exists ${s.from ?? '…'} to ${s.to ?? '…'}`);
+  }
+  e.arrows?.forEach((a, i) => { if (a.unit !== undefined && !a.unit.trim()) flag('error', e, `${arrowName(a, i)}: empty unit`); });
+  for (const f of e.forces ?? []) if (!f.unit.trim()) flag('error', e, `empty force entry`);
+  for (const ar of e.areas ?? []) if (ar.shape.length < 3) flag('error', e, `area "${ar.label}" needs at least 3 points`);
   if (e.wiki && !wiki[e.wiki]) flag('error', e, `Wikipedia title "${e.wiki}" not in wiki.json (run scripts/fetch-wiki.mjs)`);
 
   // the map has context for fighting
@@ -173,6 +182,16 @@ function extractDates(text: string): Date[] {
   for (const m of text.matchAll(/\b(\d{1,2})(?:\s*[–-]\s*\d{1,2})?\s+([A-Z][a-z]+),?\s+(\d{4})/g)) add(m[1], m[2], m[3]);
   for (const m of text.matchAll(/\b([A-Z][a-z]+)\s+(\d{1,2})(?:\s*[–-]\s*\d{1,2})?,\s+(\d{4})/g)) add(m[2], m[1], m[3]);
   return out;
+}
+
+// ── strategic sites ─────────────────────────────────────────────────────────────
+const siteIds = new Set<string>();
+for (const s of SITES) {
+  if (siteIds.has(s.id)) flag('error', undefined, `duplicate site id "${s.id}"`);
+  siteIds.add(s.id);
+  const [w, so, ea, n] = geo.bbox;
+  if (s.at[0] < w || s.at[0] > ea || s.at[1] < so || s.at[1] > n) flag('error', undefined, `site ${s.id} at ${fmt(s.at)} is outside the map`);
+  if (s.from && s.to && s.from > s.to) flag('error', undefined, `site ${s.id}: from ${s.from} is after to ${s.to}`);
 }
 
 // ── zones and phases ────────────────────────────────────────────────────────────

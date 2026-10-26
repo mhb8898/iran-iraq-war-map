@@ -28,6 +28,10 @@ a { color: #8a3b12; }
 #map { position: absolute; inset: 0 0 var(--dock-h) 0; background: #c3d3d1; }
 .map-svg { width: 100%; height: 100%; display: block; cursor: grab; touch-action: none; }
 .map-svg:active { cursor: grabbing; }
+/* The map repaints every frame while it pans and zooms. Give it and each card floating over it
+   their own compositor layer, so the cards are never re-rastered with the map and can't flash
+   half-drawn when the map falls behind. */
+#map, .masthead, .left-col, .map-controls, .dock, #panel { will-change: transform; }
 
 .country { stroke: none; }
 .country.c-IRN { fill: var(--iran); fill-opacity: 0.07; }
@@ -91,6 +95,33 @@ a { color: #8a3b12; }
 .arrow .glyph { font-size: 14px; text-anchor: middle; dominant-baseline: central; fill: #1d1a17; }
 .offmap text { font: 700 11px var(--sans); letter-spacing: 0.04em; fill: #fffaf0; paint-order: stroke; stroke: #1d1a17; stroke-width: 4px; stroke-linejoin: round; }
 .arrow-label { font: 700 11px var(--sans); text-transform: uppercase; letter-spacing: 0.06em; text-anchor: middle; paint-order: stroke; stroke: #fbf6ea; stroke-width: 3.4px; stroke-linejoin: round; }
+.arrow-unit { font: italic 600 10.5px var(--sans); letter-spacing: 0.02em; text-anchor: middle; paint-order: stroke; stroke: #fbf6ea; stroke-width: 3.2px; stroke-linejoin: round; }
+.area { fill: var(--c); fill-opacity: 0.1; stroke: var(--c); stroke-width: 2px; pointer-events: none; }
+.area.trap { stroke-dasharray: 7 4; fill-opacity: 0.16; stroke-width: 2.4px; }
+.area.defence { stroke-dasharray: 2 4; stroke-width: 5px; stroke-linecap: butt; fill-opacity: 0.07; }
+.area.water { fill: #5f93ab; fill-opacity: 0.55; stroke: #2f6680; stroke-width: 1.4px; }
+.area-label { font: italic 700 10.5px var(--sans); letter-spacing: 0.04em; text-anchor: middle; fill: var(--c); paint-order: stroke; stroke: #fbf6ea; stroke-width: 3.2px; stroke-linejoin: round; pointer-events: none; }
+.area-label.water { fill: #1f4f66; }
+
+/* strategic sites */
+.site { --c: var(--ink); }
+.map-svg .site { cursor: pointer; }
+.site.side-iran { --c: var(--iran); }
+.site.side-iraq { --c: var(--iraq); }
+.site .frame { fill: #fffaf0; stroke: var(--c); stroke-width: 1.6px; }
+.site .mark { fill: none; stroke: var(--c); stroke-width: 1.4px; }
+.site .ico { font-size: 10px; text-anchor: middle; dominant-baseline: central; fill: var(--c); }
+.site .solid { fill: #1d1a17; stroke: #fffaf0; stroke-width: 1.2px; }
+.site .dam { fill: #2f6680; stroke: #fffaf0; stroke-width: 1px; }
+.site .wave { fill: none; stroke: #2f6680; stroke-width: 1.2px; }
+.site .pass { fill: none; stroke: #1d1a17; stroke-width: 2.2px; stroke-linecap: round; paint-order: stroke; }
+.site .glyph { filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.25)); }
+.site.hl .frame { fill: #ffd54a; }
+.site.hl .solid, .site.hl .dam { stroke: #ffd54a; stroke-width: 2px; }
+.site-label { font: 600 10.5px var(--sans); fill: var(--c); paint-order: stroke; stroke: #fbf6ea; stroke-width: 3px; stroke-linejoin: round; letter-spacing: 0.02em; }
+.site.k-command .site-label { font: italic 700 10.5px var(--serif); text-transform: uppercase; letter-spacing: 0.06em; }
+.site.k-oil .site-label, .site.k-port .site-label, .site.k-dam .site-label, .site.k-pass .site-label { fill: var(--ink); }
+.site.hl .site-label { font-size: 11.5px; }
 .arrow.side-iran .body { filter: drop-shadow(0 1px 1.5px rgba(0, 0, 0, 0.35)); }
 .arrow.side-iraq .body { filter: drop-shadow(0 1px 1.5px rgba(0, 0, 0, 0.35)); }
 
@@ -228,6 +259,19 @@ a { color: #8a3b12; }
 .links a[lang='fa'] { font-family: var(--fa); }
 .refs ol { padding-left: 18px; margin: 4px 0; font-size: 12px; line-height: 1.45; color: var(--ink-2); }
 .refs li { margin-bottom: 4px; }
+.forces .side h4 { font: 700 12px var(--sans); margin: 8px 0 4px; color: var(--c); }
+.forces ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; font-size: 12.5px; line-height: 1.4; }
+.forces li { padding-left: 12px; border-left: 3px solid var(--c); }
+.forces li span { color: var(--ink-2); }
+.sites-list { list-style: none; margin: 6px 0 0; padding: 0; display: grid; gap: 6px; font-size: 12.5px; line-height: 1.4; }
+.sites-list li { display: grid; grid-template-columns: 24px 1fr; gap: 8px; align-items: start; }
+.sites-list svg { overflow: visible; }
+.lg-site { width: 22px; height: 18px; flex: none; overflow: visible; }
+.lg-area { display: inline-block; width: 22px; height: 12px; flex: none; border-radius: 3px; }
+.lg-area.trap { border: 2px dashed var(--iraq); background: color-mix(in srgb, var(--iraq) 15%, transparent); }
+.lg-area.defence { border: 3px dotted var(--iraq); }
+.lg-area.water { background: #5f93ab; border: 1px solid #2f6680; }
+#legend .sites-toggle { border-top: none; padding-top: 2px; }
 .muted { color: var(--ink-2); }
 .small { font-size: 11.5px !important; }
 
@@ -271,6 +315,7 @@ a { color: #8a3b12; }
 
 #tip { position: fixed; z-index: 10; max-width: 280px; background: var(--ink); color: var(--paper-2); padding: 8px 11px; border-radius: 4px; font-size: 12.5px; line-height: 1.4; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3); }
 #tip span { color: #ffd54a; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; }
+#tip .tip-fa { color: #e9e1cf; font: 600 12px var(--fa); text-transform: none; letter-spacing: 0; }
 #tip p { margin: 4px 0 0; }
 
 /* ── small screens: panel becomes a bottom sheet ─────────────────────────── */
@@ -327,3 +372,5 @@ a { color: #8a3b12; }
   .transport #play { flex: 1; max-width: 120px; }
   .side-filter { flex: none; }
 }
+.tiles .tile { opacity: 0; transition: opacity 0.4s; }
+.tiles .tile.in { opacity: 1; }

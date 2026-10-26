@@ -2,7 +2,7 @@ import './style.css';
 import { timer } from 'd3-timer';
 import { easeCubicOut } from 'd3-ease';
 import { buildControl, loadData } from './geo';
-import { WarMap, type ArrowState } from './map';
+import { WarMap, SITE_GLYPH, SITE_KIND_NAME, type ArrowState } from './map';
 import { Overview } from './overview';
 import { Timeline } from './timeline';
 import { parseDate, phaseAt, phaseBefore, phaseAfter } from './phase-logic';
@@ -100,6 +100,7 @@ async function main() {
       timeline.setSelected();
       map.setArrows([]);
       map.setHighlighted([]);
+      map.setDate(d.toISOString().slice(0, 10));
       const p = phaseAt(d);
       setPhase(p);
       renderPhase(card, p, control.get(p.id)!, d);
@@ -112,7 +113,7 @@ async function main() {
   function animateArrows(e: WarEvent, after: Phase) {
     anim?.stop();
     const arrows: ArrowState[] = (e.arrows ?? []).map((arrow) => ({ arrow, t: 0 }));
-    map.setArrows(arrows);
+    map.setArrows(arrows, e.areas);
     // main thrusts first, then counter-attacks and retreats
     const order = (a: ArrowState) => (a.arrow.kind === 'counter' ? 1 : a.arrow.kind === 'retreat' ? 2 : 0);
     const starts = new Map<ArrowState, number>();
@@ -154,7 +155,8 @@ async function main() {
       setPhase(before, false);
       animateArrows(e, after);
     });
-    map.setHighlighted(e.places ?? []);
+    map.setHighlighted(e.places ?? [], e.sites);
+    map.setDate(e.date);
     map.setArrows([]);
     anim?.stop();
     setPhase(e.arrows?.length ? before : after);
@@ -204,6 +206,14 @@ async function main() {
   document.getElementById('close-panel')!.onclick = () => (isPhone() && panel.dataset.open === 'true' ? (panel.dataset.open = 'peek') : openPanel(false));
   const compare = document.getElementById('compare') as HTMLInputElement;
   compare.onchange = () => map.setCompare(compare.checked);
+  const showSites = document.getElementById('show-sites') as HTMLInputElement;
+  showSites.onchange = () => map.setShowSites(showSites.checked);
+  const LEGEND_SITES: [keyof typeof SITE_GLYPH, string, string][] = [
+    ['airbase', 'iran', 'Air base'], ['oil', 'iran', 'Oil field, refinery or terminal'], ['port', 'iran', 'Port'], ['nuclear', 'iraq', 'Nuclear site'],
+    ['dam', 'iran', 'Dam'], ['pass', 'iran', 'Mountain pass'], ['garrison', 'iran', 'Army division base'], ['command', 'iraq', 'Corps sector / command'],
+  ];
+  document.getElementById('legend-sites')!.innerHTML = LEGEND_SITES.map(([k, side, text]) =>
+    `<li><svg class="lg-site" viewBox="-11 -9 22 18"><g class="site k-${k} side-${side}"><g class="glyph">${SITE_GLYPH[k].replace(/V15/, 'V9')}</g></g></svg>${text}</li>`).join('');
   // the legend and the overview share the left column; on short screens the legend starts folded
   if (!isPhone() && window.innerHeight < 960) document.getElementById('legend')!.classList.add('collapsed');
   document.getElementById('legend-toggle')!.onclick = () => document.getElementById('legend')!.classList.toggle('collapsed');
@@ -214,6 +224,17 @@ async function main() {
     if (ev.key === ' ') (ev.preventDefault(), document.getElementById('play')!.click());
   });
 
+  const showTip = (html: string, x: number, y: number) => {
+    const tip = document.getElementById('tip')!;
+    tip.innerHTML = html;
+    tip.style.left = `${Math.max(8, Math.min(x + 12, window.innerWidth - 290))}px`;
+    tip.style.top = `${y + 12}px`;
+    tip.hidden = false;
+    setTimeout(() => window.addEventListener('pointerdown', () => (tip.hidden = true), { once: true }), 0);
+  };
+  const escHtml = (t: string) => t.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
+  map.onSiteClick = (s, x, y) =>
+    showTip(`<b>${escHtml(s.name)}</b>${s.fa ? ` <span dir="rtl" lang="fa" class="tip-fa">${escHtml(s.fa)}</span>` : ''}<br><span>${SITE_KIND_NAME[s.kind]} · ${s.side === 'iran' ? 'Iran' : 'Iraq'}</span><p>${escHtml(s.note)}</p>`, x, y);
   map.onZoneClick = (z, x, y) => {
     const tip = document.getElementById('tip')!;
     tip.innerHTML = `<b>${z.properties.label}</b><br><span>${z.properties.kind === 'iraqHeld' ? 'Held by Iraq' : z.properties.kind === 'iranHeld' ? 'Held by Iran' : 'Contested / not fully controlled'}</span>${z.properties.note ? `<p>${z.properties.note}</p>` : ''}`;
@@ -233,6 +254,7 @@ async function main() {
     // open on the moment that shows the most: the furthest Iraqi advance
     const p = PHASES.find((ph) => ph.id === 'invasion-max')!;
     setPhase(p, false);
+    map.setDate(p.date);
     timeline.setCursor(parseDate(p.date));
     renderPhase(card, p, control.get(p.id)!, parseDate(p.date));
     setPeek(p.label, p.date);

@@ -1,13 +1,14 @@
 import { geoGraticule, geoMercator, geoPath, type GeoProjection } from 'd3-geo';
 import { select, type Selection } from 'd3-selection';
 import { zoom as d3zoom, zoomIdentity, type ZoomBehavior, type ZoomTransform } from 'd3-zoom';
-import { line, curveCatmullRom } from 'd3-shape';
+import { line, curveCatmullRom, curveCatmullRomClosed } from 'd3-shape';
 import 'd3-transition';
 import { easeCubicInOut } from 'd3-ease';
 import type { LineString, MultiLineString } from 'geojson';
 import type { Base, Relief, ZoneFeature } from './geo';
 import { PLACES } from './data/places';
-import type { Arrow, LonLat } from './types';
+import { SITES } from './data/sites';
+import type { Arrow, BattleArea, LonLat, Place, Site, SiteKind } from './types';
 
 const NS = 'http://www.w3.org/2000/svg';
 type G = Selection<SVGGElement, unknown, null, undefined>;
@@ -23,6 +24,25 @@ const RIVERS_LABELLED: Record<string, string> = {
 };
 const MAJOR_RIVERS = /Tigris|Euphrates|Shatt|Karun|Karkheh/;
 
+/** Site symbols, drawn around (0,0) at a fixed screen size. Military formations use a NATO-style frame. */
+export const SITE_GLYPH: Record<SiteKind, string> = {
+  airbase: '<circle r="7.5" class="frame"/><text class="ico" y="0.5">✈</text>',
+  oil: '<path class="solid" d="M0,-7.5C3.5,-3 5.5,0 5.5,2.5A5.5,5.5 0 1 1 -5.5,2.5C-5.5,0 -3.5,-3 0,-7.5Z"/>',
+  port: '<circle r="7.5" class="frame"/><text class="ico" y="0.5">⚓</text>',
+  nuclear: '<circle r="7.5" class="frame"/><text class="ico" y="0.5">☢</text>',
+  dam: '<path class="dam" d="M-7,-3.5H7L5,4.5H-5Z"/><path class="wave" d="M-8,-6q2,-2 4,0t4,0t4,0t4,0"/>',
+  pass: '<path class="pass" d="M-6,-7Q-1,0 -6,7M6,-7Q1,0 6,7"/>',
+  garrison: '<rect class="frame" x="-9" y="-6" width="18" height="12"/><path class="mark" d="M-9,-6L9,6M9,-6L-9,6"/>',
+  command: '<path class="mark" d="M-9,6V15"/><rect class="frame" x="-9" y="-6" width="18" height="12"/><path class="mark" d="M-5,0H5"/>',
+};
+const SITE_KIND_NAME: Record<SiteKind, string> = {
+  airbase: 'Air base', oil: 'Oil installation', port: 'Port', nuclear: 'Nuclear site', dam: 'Dam', pass: 'Mountain pass',
+  garrison: 'Division base', command: 'Corps / command sector',
+};
+export { SITE_KIND_NAME };
+// corps names are set in spaced italic capitals, wider than the plain labels
+const siteLabelW = (s: Site) => s.name.length * (s.kind === 'command' ? 8.6 : 6.1) + 6;
+
 export interface ArrowState {
   arrow: Arrow;
   t: number; // 0..1 drawn
@@ -35,15 +55,28 @@ export class WarMap {
   private height = 0;
   private transform: ZoomTransform = zoomIdentity;
   private zoomer: ZoomBehavior<SVGSVGElement, unknown>;
-  private layers: { base: G; controlClip: G; control: G; top: G; overlay: G; arrows: G; places: G; labels: G; ui: G };
+  private layers: { base: G; controlClip: G; control: G; top: G; overlay: G; arrows: G; places: G; sites: G; labels: G; ui: G };
   private controlFeatures: ZoneFeature[] = [];
   private historic?: '1937';
   private minK = 1;
   private highlighted = new Set<string>();
+  private highlightedSites = new Set<string>();
+  private date = '';
+  private showSites = true;
   arrows: ArrowState[] = [];
+  private areas: BattleArea[] = [];
+  /** screen boxes of the site symbols and labels just placed; arrow labels steer around them */
+  private siteBoxes: [number, number, number, number][] = [];
+  /** camera moves under way (a fly-to, a wheel zoom, a drag): tiles wait for it to stop, labels only drop out, never pop in */
+  private moving = 0;
+  private get flying() {
+    return this.moving > 0;
+  }
+  private lastShown = new Set<string>();
   private compareX: number | null = null;
   private riverAnchors: { text: string; a: LonLat; b: LonLat }[] = [];
   onZoneClick?: (z: ZoneFeature, x: number, y: number) => void;
+  onSiteClick?: (s: Site, x: number, y: number) => void;
   /** visible area as [west, south, east, north], after every zoom/pan */
   onView?: (bounds: [number, number, number, number]) => void;
 
@@ -63,20 +96,30 @@ export class WarMap {
       overlay: root.append('g').attr('class', 'overlay'),
       arrows: undefined as never,
       places: undefined as never,
+      sites: undefined as never,
       labels: undefined as never,
       ui: undefined as never,
     };
     this.layers.control = this.layers.controlClip.append('g').attr('class', 'control');
     this.layers.labels = this.layers.overlay.append('g').attr('class', 'labels');
+    this.layers.sites = this.layers.overlay.append('g').attr('class', 'sites');
     this.layers.places = this.layers.overlay.append('g').attr('class', 'places');
     this.layers.arrows = this.layers.overlay.append('g').attr('class', 'arrows');
     this.layers.ui = this.layers.overlay.append('g').attr('class', 'ui');
 
     this.zoomer = d3zoom<SVGSVGElement, unknown>()
       .scaleExtent([1, 40])
+      .on('start', () => {
+        this.moving++;
+      })
       .on('zoom', (e) => {
         this.transform = e.transform;
         this.applyTransform();
+      })
+      .on('end', () => {
+        // settle tiles and labels once where the camera came to rest
+        this.moving = Math.max(0, this.moving - 1);
+        if (!this.moving) this.applyTransform();
       });
     this.svg.call(this.zoomer).on('dblclick.zoom', null);
 
@@ -151,7 +194,7 @@ export class WarMap {
 
   /** Relief tiles: pick the zoom that matches the screen, draw it over its parent so there are no holes while loading. */
   private updateTiles() {
-    if (!this.tileLayer) return;
+    if (!this.tileLayer || this.flying) return;
     const z0 = Math.log2((2 * Math.PI * this.projection.scale()) / 256);
     const zooms = Object.keys(this.relief.zooms).map(Number).sort((a, b) => a - b);
     const want = Math.round(z0 + Math.log2(this.transform.k) + 0.25);
@@ -178,8 +221,16 @@ export class WarMap {
     const lon = (x: number, z: number) => (x / 2 ** z) * 360 - 180;
     const lat = (y: number, z: number) => (Math.atan(Math.sinh(Math.PI * (1 - (2 * y) / 2 ** z))) * 180) / Math.PI;
     const proj = (p: [number, number]) => this.projection(p)!;
-    this.tileLayer.selectAll<SVGImageElement, (typeof tiles)[number]>('image').data(tiles, (t) => `${t.z}/${t.x}/${t.y}`)
-      .join((enter) => enter.append('image').attr('preserveAspectRatio', 'none').attr('href', (t) => `${import.meta.env.BASE_URL}relief/${t.z}/${t.x}/${t.y}.webp`))
+    // new tiles fade in once loaded; the ones they replace stay underneath a moment so nothing blinks
+    const layer = this.tileLayer;
+    layer.selectAll<SVGImageElement, (typeof tiles)[number]>('image:not(.stale)').data(tiles, (t) => `${t.z}/${t.x}/${t.y}`)
+      .join(
+        (enter) => enter.append('image').attr('class', 'tile').attr('preserveAspectRatio', 'none')
+          .on('load', function () { this.classList.add('in'); })
+          .attr('href', (t) => `${import.meta.env.BASE_URL}relief/${t.z}/${t.x}/${t.y}.webp`),
+        (update) => update,
+        (exit) => exit.classed('stale', true).lower().each(function () { setTimeout(() => this.remove(), 900); }),
+      )
       .each(function (t) {
         const p0 = proj([lon(t.x, t.z), lat(t.y, t.z)]), p1 = proj([lon(t.x + 1, t.z), lat(t.y + 1, t.z)]);
         // overlap by a hair so seams don't show
@@ -315,26 +366,78 @@ export class WarMap {
     return this.transform.apply(this.projection(p)!) as [number, number];
   }
 
-  setHighlighted(ids: string[]) {
+  setHighlighted(ids: string[], sites: string[] = []) {
     this.highlighted = new Set(ids);
+    this.highlightedSites = new Set(sites);
     this.drawPlaces();
   }
 
+  /** The date the map shows (ISO); sites that did not exist yet, or any more, are hidden. */
+  setDate(iso: string) {
+    if (iso === this.date) return;
+    this.date = iso;
+    this.drawPlaces();
+  }
+
+  setShowSites(on: boolean) {
+    this.showSites = on;
+    this.drawPlaces();
+  }
+
+  /** Towns and strategic sites share one greedy placement pass so their labels never overlap. */
   private drawPlaces() {
+    if (!this.projection) return;
     const k = this.transform.k;
-    const candidates = PLACES.filter((p) => this.highlighted.has(p.id) || p.rank === 1 || (p.rank === 2 && k >= 1.5) || (p.rank === 3 && k >= 2.6))
-      .sort((a, b) => Number(this.highlighted.has(b.id)) - Number(this.highlighted.has(a.id)) || a.rank - b.rank);
-    // greedy label placement: skip a town whose label box would collide with one already placed
+    const hlP = (p: Place) => this.highlighted.has(p.id);
+    const hlS = (s: Site) => this.highlightedSites.has(s.id);
+    const towns = PLACES.filter((p) => hlP(p) || p.rank === 1 || (p.rank === 2 && k >= 1.5) || (p.rank === 3 && k >= 2.6));
+    const live = (s: Site) => (!s.from || !this.date || s.from <= this.date) && (!s.to || !this.date || s.to >= this.date);
+    const sites = SITES.filter((s) => live(s) && (hlS(s) || (this.showSites && (s.rank === 1 ? k >= 1.4 : k >= 2.4))));
+    // highlighted towns, highlighted sites, other towns by rank, other sites
+    type C = { p?: Place; s?: Site; hl: boolean; order: number };
+    const cands: C[] = [
+      ...towns.map((p) => ({ p, hl: hlP(p), order: hlP(p) ? 0 : 2 + p.rank })),
+      ...sites.map((s) => ({ s, hl: hlS(s), order: hlS(s) ? 1 : 6 + s.rank })),
+    ].sort((a, b) => a.order - b.order);
+    // phones with an operation on screen: sites show as symbols only, the arrows need the room
+    const quiet = this.width <= 900 && this.arrows.length > 0;
     const boxes: [number, number, number, number][] = [];
-    const visible = candidates.filter((p) => {
-      const [x, y] = this.screen(p.at);
-      if (x < -50 || y < -20 || x > this.width + 50 || y > this.height + 20) return false;
-      const w = 12 + Math.max(p.name.length * 6.6, p.fa.length * 5.2);
-      const box: [number, number, number, number] = [x - 4, y - 12, x + w, y + 15];
-      if (boxes.some((b) => box[0] < b[2] && box[2] > b[0] && box[1] < b[3] && box[3] > b[1])) return false;
-      boxes.push(box);
-      return true;
+    const hit = (box: [number, number, number, number]) => boxes.some((b) => box[0] < b[2] && box[2] > b[0] && box[1] < b[3] && box[3] > b[1]);
+    const visible: Place[] = [];
+    const shownSites: { s: Site; label: boolean }[] = [];
+    const key = (c: C) => (c.p ? `p:${c.p.id}` : `s:${c.s!.id}`);
+    for (const c of cands) {
+      // mid-flight nothing new appears; it would only blink in and out as the view sweeps past
+      if (this.flying && !c.hl && !this.lastShown.has(key(c))) continue;
+      const [x, y] = this.screen((c.p ?? c.s)!.at);
+      if (x < -50 || y < -20 || x > this.width + 50 || y > this.height + 20) continue;
+      if (c.p) {
+        const w = 12 + Math.max(c.p.name.length * 6.6, c.p.fa.length * 5.2);
+        const box: [number, number, number, number] = [x - 4, y - 12, x + w, y + 15];
+        if (hit(box)) continue;
+        boxes.push(box);
+        visible.push(c.p);
+        continue;
+      }
+      const s = c.s!;
+      const glyph: [number, number, number, number] = [x - 10, y - 9, x + 10, y + (s.kind === 'command' ? 16 : 9)];
+      const wantLabel = c.hl || (!quiet && (s.kind === 'command' || k >= (s.rank === 1 ? 2.4 : 3.4)));
+      const lw = siteLabelW(s);
+      const withLabel: [number, number, number, number] = [glyph[0], glyph[1], x + 13 + lw, glyph[3]];
+      if (wantLabel && !hit(withLabel)) {
+        boxes.push(withLabel);
+        shownSites.push({ s, label: true });
+      } else if (c.hl || !hit(glyph)) {
+        boxes.push(glyph);
+        shownSites.push({ s, label: false });
+      }
+    }
+    if (!this.flying) this.lastShown = new Set([...visible.map((p) => `p:${p.id}`), ...shownSites.map(({ s }) => `s:${s.id}`)]);
+    this.siteBoxes = shownSites.map(({ s, label }) => {
+      const [x, y] = this.screen(s.at);
+      return [x - 10, y - 9, label ? x + 13 + siteLabelW(s) : x + 10, y + 9] as [number, number, number, number];
     });
+    this.drawSites(shownSites);
     const g = this.layers.places.selectAll<SVGGElement, (typeof PLACES)[number]>('g.place').data(visible, (p) => p.id);
     g.exit().remove();
     const e = g.enter().append('g').attr('class', 'place');
@@ -348,6 +451,23 @@ export class WarMap {
     all.select('circle').attr('r', (p) => (p.rank === 1 ? 4.5 : this.highlighted.has(p.id) ? 4 : 2.8));
     all.select('text.en').attr('x', 7).attr('y', -1).text((p) => p.name);
     all.select('text.fa').attr('x', 7).attr('y', 11).text((p) => p.fa);
+  }
+
+  private drawSites(shown: { s: Site; label: boolean }[]) {
+    const g = this.layers.sites.selectAll<SVGGElement, { s: Site; label: boolean }>('g.site').data(shown, (d) => d.s.id);
+    g.exit().remove();
+    const e = g.enter().append('g')
+      .attr('class', (d) => `site k-${d.s.kind} side-${d.s.side}`)
+      .on('click', (ev: MouseEvent, d) => {
+        ev.stopPropagation();
+        this.onSiteClick?.(d.s, ev.clientX, ev.clientY);
+      });
+    e.append('g').attr('class', 'glyph').html((d) => SITE_GLYPH[d.s.kind]);
+    e.append('text').attr('class', 'site-label').attr('x', 13).attr('y', 4);
+    e.merge(g)
+      .attr('transform', (d) => `translate(${this.screen(d.s.at)})`)
+      .classed('hl', (d) => this.highlightedSites.has(d.s.id))
+      .select('text.site-label').text((d) => (d.label ? d.s.name : ''));
   }
 
   private drawLabels() {
@@ -382,8 +502,10 @@ export class WarMap {
     }
   }
 
-  setArrows(arrows: ArrowState[]) {
+  setArrows(arrows: ArrowState[], areas: BattleArea[] = []) {
     this.arrows = arrows;
+    this.areas = areas;
+    this.drawPlaces();
     this.drawArrows();
     this.drawLabels();
   }
@@ -393,7 +515,25 @@ export class WarMap {
     const k = this.transform.k;
     const w = Math.max(5, Math.min(13, 4 + 2.4 * Math.log2(k + 1)));
     const smooth = line().curve(curveCatmullRom.alpha(0.5));
-    const labelBoxes: [number, number, number, number][] = [];
+    const labelBoxes: [number, number, number, number][] = [...this.siteBoxes];
+    // labels go in their own group, raised over every arrow body once all are drawn
+    const tags = A.append('g').attr('class', 'arrow-tags');
+    // kill zones, dug-in lines and flooded barriers fade in as the first arrows start moving
+    const shown = Math.min(1, Math.max(0, ...this.arrows.map((a) => a.t)) * 2.5);
+    if (this.areas.length && shown > 0) {
+      const ring = line().curve(curveCatmullRomClosed.alpha(0.5));
+      const G = A.append('g').attr('class', 'areas').attr('opacity', shown);
+      for (const area of this.areas) {
+        const pts = area.shape.map((p) => this.screen(p));
+        const color = area.side === 'iran' ? COLORS.iran : area.side === 'iraq' ? COLORS.iraq : COLORS.other;
+        G.append('path').attr('class', `area ${area.kind}`).attr('d', ring(pts)!).style('--c', color);
+        // label just under the area: arrows converge on its middle
+        const cx = pts.reduce((s, p) => s + p[0], 0) / pts.length, cy = Math.max(...pts.map((p) => p[1])) + 10;
+        const text = area.kind === 'trap' ? `⚠ ${area.label}` : area.label;
+        G.append('text').attr('class', `area-label ${area.kind}`).attr('x', cx).attr('y', cy + 4).style('--c', color).text(text);
+        labelBoxes.push([cx - text.length * 3.4, cy - 8, cx + text.length * 3.4, cy + 8]);
+      }
+    }
     for (const { arrow, t } of this.arrows) {
       if (t <= 0) continue;
       const pts = arrow.path.map((p) => this.screen(p));
@@ -456,21 +596,28 @@ export class WarMap {
         tag.append('text').attr('x', westward ? 12 : -12).attr('y', 18).attr('text-anchor', westward ? 'start' : 'end')
           .text(westward ? `◀ ${arrow.offMap}` : `${arrow.offMap} ▶`);
       }
-      if (arrow.label && t > 0.55) {
+      // the unit tag rides under the axis label (or alone, smaller, when the axis has no name);
+      // on phones it waits until zoomed in, where there is room for it
+      const unit = arrow.unit && (this.width > 900 || k >= 2.5) ? arrow.unit : undefined;
+      if ((arrow.label || unit) && t > 0.55) {
         // try a few spots along and either side of the arrow until the label doesn't collide
-        const tw = arrow.label.length * 6.8 + 6;
-        for (const [along, side] of [[0.5, -1], [0.5, 1], [0.3, -1], [0.7, -1], [0.3, 1], [0.7, 1], [0.5, -2.2]] as const) {
+        const tw = Math.max(arrow.label ? arrow.label.length * 6.8 + 6 : 0, unit ? unit.length * 5.9 + 14 : 0);
+        const extra = arrow.label && unit ? 13 : 0; // second line
+        for (const [along, side] of [[0.5, -1], [0.5, 1], [0.3, -1], [0.7, -1], [0.3, 1], [0.7, 1], [0.5, -2.2], [0.5, 2.2]] as const) {
           const p = node.getPointAtLength(len * along * t);
-          const y = p.y + side * (bw + 8) + (side > 0 ? 6 : 0);
-          const box: [number, number, number, number] = [p.x - tw / 2, y - 11, p.x + tw / 2, y + 3];
+          // y is the first line's baseline; above the arrow the block grows upward, below it downward
+          const y = p.y + side * (bw + 8) + (side > 0 ? 6 : -extra);
+          const box: [number, number, number, number] = [p.x - tw / 2, y - 11, p.x + tw / 2, y + 3 + extra];
           if (labelBoxes.some((b) => box[0] < b[2] && box[2] > b[0] && box[1] < b[3] && box[3] > b[1])) continue;
           labelBoxes.push(box);
-          g.append('text').attr('class', 'arrow-label').attr('x', p.x).attr('y', y).attr('fill', color).text(arrow.label);
+          if (arrow.label) tags.append('text').attr('class', 'arrow-label').attr('x', p.x).attr('y', y).attr('fill', color).text(arrow.label);
+          if (unit) tags.append('text').attr('class', 'arrow-unit').attr('x', p.x).attr('y', arrow.label ? y + 13 : y).attr('fill', color).text(`⚑ ${unit}`);
           break;
         }
       }
       probe.remove();
     }
+    tags.raise();
   }
 
   // ── transform & camera ─────────────────────────────────────────────────────────
